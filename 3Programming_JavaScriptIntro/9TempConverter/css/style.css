@@ -1,0 +1,39 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
+
+* {
+	box-sizing: border-box;
+	font-size: 1rem;
+}
+
+html {
+	font-size: 24px;
+}
+
+body {
+	font-family: 'Open Sans', sans-serif;
+}
+
+#wrapper {
+	width: 800px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+h1 {
+	font-size: 2.2rem;
+}
+
+form input {
+	font-size: 1.25rem;
+	padding: .75rem .5rem .25rem .5rem;
+	color: gold;
+	border: none;
+	border-bottom: 2px solid gray;
+	margin-bottom: .75rem;
+	text-align: center;
+}
+
+form button {
+	border-radius: .25rem;
+}

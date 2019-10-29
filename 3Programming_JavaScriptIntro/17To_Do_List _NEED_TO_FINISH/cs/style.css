@@ -1,0 +1,17 @@
+li button {
+    display:none;
+}
+
+li:hover button {
+    color:red;
+    display:inline;
+}
+
+li:hover {
+    color:red;
+}
+
+.done {
+    text-decoration: line-through;
+}
+
