@@ -1,2 +1,2 @@
-Last Update: 2019.10.29C
+Last Update: 2019.11.08
 This is the Lesson Summaries
