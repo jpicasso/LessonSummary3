@@ -14,7 +14,7 @@ class User:
         with CursorFromConnectionFromPool() as cursor:
             # this is similar to the .format method; it is also more secure than doing it in other ways
             cursor.execute('INSERT INTO users (email, first_name, last_name) VALUES (%s, %s, %s)', (self.email, self.first_name, self.last_name))
-            cursor.execute('SELECT * FROM purchases')
+            # cursor.execute('SELECT * FROM purchases')
 
         # alternative longer code...
         # connection = psycopg2.connect(user='postgres', password='Apple2017', database='learning', host='localhost')

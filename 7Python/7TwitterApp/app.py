@@ -7,7 +7,7 @@ from database import Database
 app = Flask(__name__)
 app.secret_key = '1234'
 
-Database.initialise(host='localhost', database='learning', user='postgres', password='1234')
+Database.initialise(host='localhost', database='learning', user='postgres', password='Apple2017')
 
 
 @app.before_request
