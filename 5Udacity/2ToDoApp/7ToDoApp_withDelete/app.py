@@ -1,9 +1,9 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, abort
+from flask import Flask, render_template, request, redirect, url_for, jsonify, abort #allows you to use flask and its components
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import sys
 
-app = Flask(__name__)
+app = Flask(__name__)                                   # pulls a special variable that gets as value the string "__main__" when you're executing the script
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://johnpicasso:1234@localhost:5432/todoapp'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)

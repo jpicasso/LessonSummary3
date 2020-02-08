@@ -75,8 +75,10 @@ Instructions
 4. Fill out every `TODO` section throughout the codebase. We suggest going in order of the following:
 
   1. Connect to a database in `config.py`. A project submission that uses a local database connection is fine.
-  2. Using SQLAlchemy, set up normalized models for the objects we support in our web app in the Models section of `app.py`. Check out the sample pages provided at /artists/1, /venues/1, and /shows/1 for examples of the data we want to model, using all of the learned best practices in database schema design. Implement missing model properties and relationships using database migrations via Flask-Migrate.
+  2. Using SQLAlchemy, set up normalized models for the objects we support in our web app in the Models section of `app.py`. Check out the sample pages provided at /artists/1, /venues/1, and /shows/1 for examples of the data we want to model, using all of the learned best practices in database schema design. Implement missing model properties and relationships using database migrations via Flask-Migrate. (i.e. $ flask db migrate #run without virtual env on)
   3. Implement form submissions for creating new Venues, Artists, and Shows. There should be proper constraints, powering the `/create` endpoints that serve the create form templates, to avoid duplicate or nonsensical form submissions. Submitting a form should create proper new records in the database.
+
+<!-- LEFT OFF HERE -->
   4. Implement the controllers for listing venues, artists, and shows. Note the structure of the mock data used. We want to keep the structure of the mock data.
   5. Implement search, powering the `/search` endpoints that serve the application's search functionalities.
   6. Serve venue and artist detail pages, powering the `<venue|artist>/<id>` endpoints that power the detail pages.
@@ -135,7 +137,7 @@ To start and run the local development server,
 
 3. Run the development server:
   ```
-  $ export FLASK_APP=myapp
+  $ export FLASK_APP=app.py
   $ export FLASK_ENV=development # enables debug mode
   $ python3 app.py
   ```
@@ -144,7 +146,7 @@ To start and run the local development server,
 
 
 5. database set up (upfront)
-terminal commands executed
+terminal commands executed...don't run this in the virtual environment or it won't work
 $ dropdb fyyurapp
 $ createdb fyyurapp
 $ flask db init
