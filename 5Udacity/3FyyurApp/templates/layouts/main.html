@@ -133,8 +133,17 @@
       })
       location.href = 'http://127.0.0.1:5000/';
     }
+    function editArtist(){
+      const artistId = $('#artist_edit').val();
+      fetch('/artists/' + artistId + '/edit', {
+        method: 'GET'
+      })
+      location.href = "/artists/" + artistId + "/edit";
+    }
+
     $('#venue_del').click(deleteVenue);
     $('#artist_del').click(deleteArtist);
+    $('#artist_edit').click(editArtist);
 
   </script>  
 
