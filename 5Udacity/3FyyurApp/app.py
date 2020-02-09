@@ -373,12 +373,27 @@ def search_artists():
   for a in artist_objects:
     artist_name = a.name
     artist_name = artist_name.upper()
-    if user_search == artist_name:
+    if searchForWord(user_search, artist_name):
           new_dictionary = {"id":a.id, "name":a.name,"num_upcoming_shows":0,}
           response["data"].append(new_dictionary)
           response["count"] = response["count"]+1
 
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+
+def searchForFirstIndex (element, string):
+      for i in range (len(string)):
+            if element == string[i]:
+                  return i
+      return -1
+
+def searchForWord (search, string):
+      x = searchForFirstIndex (search[0],string)
+      if x == -1:
+            return False
+      for i in range (len(search)):
+            if search[i] != string[i+x]:
+                  return False
+      return True
 
 #  Shows
 #  ----------------------------------------------------------------
