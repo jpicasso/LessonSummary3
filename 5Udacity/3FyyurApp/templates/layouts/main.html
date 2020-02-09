@@ -126,6 +126,14 @@
       })
       location.href = 'http://127.0.0.1:5000/';
     }
+    function editVenue(){
+      console.log('ran edit venue')
+      const venueId = $('#venue_edit').val();
+      fetch('/venues/' + venueId + '/edit', {
+        method: 'GET'
+      })
+      location.href = "/venues/" + venueId + "/edit";
+    }
     function deleteArtist(){
       const artistId = $('#artist_del').val();
       fetch('/artists/' + artistId, {
@@ -142,6 +150,7 @@
     }
 
     $('#venue_del').click(deleteVenue);
+    $('#venue_edit').click(editVenue);
     $('#artist_del').click(deleteArtist);
     $('#artist_edit').click(editArtist);
 
