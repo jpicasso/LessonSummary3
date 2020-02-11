@@ -3,16 +3,16 @@
 {% block content %}
   <div class="form-wrapper">
     <form class="form" method="post" action="/artists/{{artist.id}}/edit">
-      <h3 class="form-heading">Edit artist: <em>{{ artist.name }}</em></h3>
+      <h3 class="form-heading">Edit artist: <em>{{  artist.name }}</em></h3>
       <div class="form-group">
         <label for="name">Name</label>
-        {{ form.name(class_ = 'form-control', value = '{{ artist.name }}', autofocus = true) }}
+        {{ form.name(class_ = 'form-control', value = 'Guns N Petals', autofocus = true) }}
       </div>
       <div class="form-group">
           <label>City & State</label>
           <div class="form-inline">
             <div class="form-group">
-              {{ form.city(class_ = 'form-control', placeholder='City', value='San FranciscoT', autofocus = true) }}
+              {{ form.city(class_ = 'form-control', placeholder='City', value='San Francisco', autofocus = true) }}
             </div>
             <div class="form-group">
               {{ form.state(class_ = 'form-control', placeholder='State', value='CA', autofocus = true) }}
