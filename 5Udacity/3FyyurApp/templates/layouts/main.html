@@ -143,10 +143,13 @@
     }
     function editArtist(){
       const artistId = $('#artist_edit').val();
+      console.log('got artist id '+ artistId)
       fetch('/artists/' + artistId + '/edit', {
         method: 'GET'
       })
+      console.log('just fetched artists endpoint')
       location.href = "/artists/" + artistId + "/edit";
+      console.log('took user to the rendered page')
     }
 
     $('#venue_del').click(deleteVenue);
