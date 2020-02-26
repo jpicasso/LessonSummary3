@@ -80,7 +80,6 @@ Instructions
 
   4. Implement the controllers for listing venues, artists, and shows. Note the structure of the mock data used. We want to keep the structure of the mock data.
   6. Serve venue and artist detail pages, powering the `<venue|artist>/<id>` endpoints that power the detail pages.
-<!-- LEFT OFF HERE -->
   5. Implement search, powering the `/search` endpoints that serve the application's search functionalities.
 
 

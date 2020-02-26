@@ -21,11 +21,10 @@ from config import SQLALCHEMY_DATABASE_URI
 # App Config.
 #----------------------------------------------------------------------------#
 
-app = Flask(__name__)             # pulls a special variable that gets as value the string "__main__" when you're executing the script to eventually launch app
+app = Flask(__name__)             
 app.config.from_object('config')
 print ("this is the URI: " + SQLALCHEMY_DATABASE_URI)
 app.config['SQLALCHEMY_DATABASE_URI'] = SQLALCHEMY_DATABASE_URI
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://johnpicasso:1234@localhost:5432/fyyurapp'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 moment = Moment(app)
 db = SQLAlchemy(app)
@@ -104,7 +103,7 @@ def venues():
   venue_objects = Venue.query.order_by('id').all()
   
   data = []
-  for v in venue_objects:             # gets unique list of cities without duplicates
+  for v in venue_objects:             
     if data == []:    
       new_dictionary = {"city": v.city, "state": v.state, "venues":[]}
       data.append(new_dictionary)
@@ -116,7 +115,7 @@ def venues():
       new_dictionary = {"city": v.city, "state": v.state, "venues":[]}
       data.append(new_dictionary)
   
-  for v in venue_objects:              # adds venues to corresponding city 
+  for v in venue_objects:               
     x = 0
     for c in data:
       if c["city"] == v.city:    
@@ -173,9 +172,6 @@ def create_venue_submission():
   db.session.commit()
   
   flash('Venue ' + request.form['name'] + ' was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
@@ -194,12 +190,18 @@ def delete_venue(venue_id):
 def edit_venue(venue_id):
   form = VenueForm()
   v = Venue.query.get(venue_id)
-  venue = {"id":v.id, "name":v.name, "genres": [v.genres], "city": v.city, "state": v.state, "phone": v.phone, "website": v.website,"facebook_link": v.facebook_link, "seeking_talent": v.seeking_talent, "seeking_description": v.seeking_description,"image_link": v.image_link, "past_shows": [{
-      "artist_id": 1,
-      "artist_name": "Guns N Petals",
-      "artist_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }], "upcoming_shows":[], "past_shows_count": 0,"upcoming_shows_count":0}
+  
+  form.name.data = v.name
+  form.city.data  = v.city
+  form.state.data  = v.state 
+  form.address.data  = v.address 
+  form.phone.data  = v.phone 
+  form.genres.data = v.genres 
+  form.facebook_link.data = v.facebook_link  
+  form.image_link.data = v.image_link
+
+  v = Venue.query.get(venue_id)
+  venue = {"id":v.id, "name":v.name, "genres": [v.genres], "city": v.city, "state": v.state, "phone": v.phone, "website": v.website,"facebook_link": v.facebook_link, "seeking_talent": v.seeking_talent, "seeking_description": v.seeking_description,"image_link": v.image_link, "past_shows": [], "upcoming_shows":[], "past_shows_count": 0,"upcoming_shows_count":0}
 
   return render_template('forms/edit_venue.html', form=form, venue=venue)
 
@@ -315,14 +317,17 @@ def create_artist_submission():
 def edit_artist(artist_id):
   form = ArtistForm()
   a = Artist.query.get(artist_id)
-  artist = {"id":a.id, "name":a.name, "genres": [a.genres], "city": a.city, "state": a.state, "phone": a.phone, "website": a.website,"facebook_link": a.facebook_link, "seeking_venue": a.seeking_venue, "seeking_description": a.seeking_description,"image_link": a.image_link, "past_shows": [{
-      "venue_id": 1,
-      "venue_name": "The Musical Hop",
-      "venue_image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-      "start_time": "2019-05-21T21:30:00.000Z"
-    }], "upcoming_shows":[], "past_shows_count": 0,"upcoming_shows_count":0}
+  
+  form.name.data = a.name
+  form.city.data  = a.city
+  form.state.data  = a.state 
+  form.phone.data  = a.phone 
+  form.genres.data = a.genres 
+  form.facebook_link.data = a.facebook_link  
+  form.image_link.data = a.image_link
+
+  artist = {"id":a.id, "name":a.name, "genres": [a.genres], "city": a.city, "state": a.state, "phone": a.phone, "website": a.website,"facebook_link": a.facebook_link, "seeking_venue": a.seeking_venue, "seeking_description": a.seeking_description,"image_link": a.image_link, "past_shows": [],"upcoming_shows":[], "past_shows_count": 0,"upcoming_shows_count": 0}
   return render_template('forms/edit_artist.html', form=form, artist=artist)
-  # TODO: populate form with fields from artist with ID <artist_id>
 
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
@@ -339,7 +344,6 @@ def edit_artist_submission(artist_id):
   db.session.commit()
 
   flash('Artist ' + request.form['name'] + ' was successfully updated!')
-  # TODO: on unsuccessful db insert, flash an error instead.
  
   return redirect(url_for('show_artist', artist_id=artist_id))
 
@@ -409,9 +413,6 @@ def create_show_submission():
   db.session.commit()
 
   flash('Show was successfully listed!')
-  # TODO: on unsuccessful db insert, flash an error instead.
-  # e.g., flash('An error occurred. Show could not be listed.')
-  # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
   return render_template('pages/home.html')
 
 @app.errorhandler(404)

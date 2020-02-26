@@ -84,27 +84,26 @@ def create_app(test_config=None):
 
   @app.route('/questions')
   def retrieve_questions():
-      selection = Question.query.order_by(Question.id).all()
-      current_questions = paginate_questions(request, selection)
-      
-      if len(current_questions) == 0:
-          abort(404)
-
-      categories = Category.query.order_by(Category.id).all()
-      if len(categories) == 0:
-          abort(404)
-
-      full_list = ""
-      for c in categories:
-            full_list = c.type + ', '+ full_list
-
-      return jsonify({
-          'success': True,
-          'questions': current_questions,
-          'totalQuestions': len(Question.query.all()),
-          'categories': full_list,
-          'currentCategory': categories[0].type,
-      })
+    selection = Question.query.order_by(Question.id).all()
+    current_questions = paginate_questions(request, selection)
+    
+    if len(current_questions) == 0:
+        abort(404)
+    
+    categories = Category.query.order_by(Category.id).all()
+    if len(categories) == 0:
+      abort(404)
+    full_list = []
+    for c in categories:
+      full_list.append(c.type)
+  
+    return jsonify({
+        'success': True,
+        'questions': current_questions,
+        'totalQuestions': len(Question.query.all()),
+        'categories': full_list,
+        'currentCategory': categories[0].type,
+    })
 
   # TEST: At this point, when you start the application
   # you should see questions and categories generated,
@@ -207,6 +206,25 @@ def create_app(test_config=None):
   # @TODO: 
   # Create a GET endpoint to get questions based on category. 
 
+  @app.route('/categories/<int:category_id>', methods=['GET'])
+  def retrieve_questions_by_categories(category_id):
+    all_questions = Question.query.order_by(Question.id).all()
+    
+    current_category = category_id
+    selection = []
+    for q in all_questions:
+      if q.category == current_category:
+        selection.append(q)
+    
+    current_questions = paginate_questions(request, selection)
+    
+    return jsonify({
+      'success': True, 
+      'questions': current_questions,
+      'totalQuestions': len(current_questions),
+      'currentCategory': current_category,
+    })
+
   # TEST: In the "List" tab / main screen, clicking on one of the 
   # categories in the left column will cause only questions of that 
   # category to be shown. 
@@ -219,6 +237,9 @@ def create_app(test_config=None):
   # This endpoint should take category and previous question parameters 
   # and return a random questions within the given category, 
   # if provided, and that is not one of the previous questions. 
+
+  *****************  LEFT OFF HERE *****************************
+
 
   # TEST: In the "Play" tab, after a user selects "All" or a category,
   # one question at a time is displayed, the user is allowed to answer
