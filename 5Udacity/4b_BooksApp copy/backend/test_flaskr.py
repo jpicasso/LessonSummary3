@@ -31,7 +31,7 @@ class BookTestCase(unittest.TestCase):
             self.db.create_all()
     
     def tearDown(self):
-        """Executed after reach test"""
+        """Executed after each test"""
         pass
 
     def test_get_paginated_books(self):
