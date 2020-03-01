@@ -90,13 +90,12 @@ GET '/categories'
 
 ```
 
-
 ## Testing
 To run the tests, run
 ```
 dropdb trivia_test
 createdb trivia_test
-psql trivia_test < trivia.psql
+psql trivia_test < trivia.psql 
 python test_flaskr.py
 ```
 

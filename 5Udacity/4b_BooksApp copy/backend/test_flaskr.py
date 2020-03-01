@@ -49,7 +49,7 @@ class BookTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
-        self.assertEqual(data['message'], 'resource not found')
+        self.assertEqual(d  ata['message'], 'resource not found')
 
     def test_get_book_search_with_results(self):
         res = self.client().post('/books', json={'search':'Novel'})

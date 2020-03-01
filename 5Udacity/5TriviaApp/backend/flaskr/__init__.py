@@ -35,15 +35,11 @@ def paginate_questions(request, selection):
     return current_question
 
 def create_app(test_config=None):
-  # create and configure the app
   app = Flask(__name__)
   setup_db(app)
   CORS(app)
   
-  # DONE -  Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   cors = CORS(app, resources={r"/api/*": {"origins":"*"}})
-
-  # DONE - Use the after_request decorator to set Access-Control-Allow
   
   # CORS Headers 
   @app.after_request
@@ -52,7 +48,6 @@ def create_app(test_config=None):
       response.headers.add('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
       return response
 
-  # DONE - Create an endpoint to handle GET requests for all available categories.
   @app.route('/categories', methods=['GET'])
   def retrieve_categoriess():
     categories = Category.query.order_by(Category.id).all()
@@ -68,8 +63,7 @@ def create_app(test_config=None):
       'categories': full_list
     })
 
-  # DONE -  Create an endpoint to handle GET requests for questions, including pagination (every 10 questions). This endpoint should return a list of questions, number of total questions, current category, categories. 
-
+  # @TODO - pagination numbers not showing up at bottom of page
   @app.route('/questions')
   def retrieve_questions():
     selection = Question.query.order_by(Question.id).all()
@@ -92,10 +86,7 @@ def create_app(test_config=None):
         'categories': full_list,
         'currentCategory': categories[0].type,
     })
-
-  # @TODO - TEST: At this point, when you start the application you should see questions and categories generated, ten questions per page and pagination at the bottom of the screen for three pages. Clicking on the page numbers should update the questions. 
-  
-  # DONE - Create an endpoint to DELETE question using a question ID. 
+ 
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
     try:
@@ -117,11 +108,7 @@ def create_app(test_config=None):
 
     except:
       abort(422)
-
-  # @TODO - TEST: When you click the trash icon next to a question, the question will be removed. This removal will persist in the database and when you refresh the page. 
-
-  # DONE -  Create an endpoint to POST a new question, which will require the question and answer text, category, and difficulty score.
-
+ 
   @app.route('/questions', methods=['POST'])
   def create_question():
     try:
@@ -143,12 +130,7 @@ def create_app(test_config=None):
     except:
       abort(422)
       
-  # TEST: When you submit a question on the "Add" tab, 
-  # the form will clear and the question will appear at the end of the last page
-  # of the questions list in the "List" tab.  
-  # '''
-
-  # Done - Create a POST endpoint to get questions based on a search term. It should return any questions for whom the search term is a substring of the question. 
+  # TODO  When you submit a question on the "Add" tab,  the form will clear and the question will appear at the end of the last page of the questions list in the "List" tab.  
 
   @app.route('/search', methods=['POST'])
   def search_questions():
@@ -171,12 +153,7 @@ def create_app(test_config=None):
       'currentCategory': 1,
     })
 
-  # TEST: Search by any phrase. The questions list will update to include 
-  # only question that include that string within their question. 
-  # Try using the word "title" to start. 
-  # '''
-
-  # DONE - Create a GET endpoint to get questions based on category. 
+  # TODO - searching "Bird" does not work
 
   @app.route('/categories/<int:category_id>', methods=['GET'])
   def retrieve_questions_by_categories(category_id):
@@ -197,16 +174,9 @@ def create_app(test_config=None):
       'currentCategory': current_category,
     })
 
-  # TEST: In the "List" tab / main screen, clicking on one of the 
-  # categories in the left column will cause only questions of that 
-  # category to be shown. 
-  # '''
+  # TODO - Update picture icons in js react code
+  # TODO - Make sure ALL category selector works!
 
-  # DONE - Create a POST endpoint to get questions to play the quiz. This endpoint should take category and previous question parameters and return random questions within the given category, if provided, and that is not one of the previous questions. 
-
-
-  # TODO - Make sure all category selector works!
-  
   @app.route('/quizzes', methods=['POST'])
   def get_quiz_questions():  
     prev_questions = request.json.get('previous_questions', "")
@@ -239,11 +209,14 @@ def create_app(test_config=None):
       'guess': '',
     })
 
-  # TEST: In the "Play" tab, after a user selects "All" or a category,
-  # one question at a time is displayed, the user is allowed to answer
-  # and shown whether they were correct or not. 
-  # '''
-
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      "success": False, 
+      "error": 400,
+      "message": "bad request"
+    }), 400
+  
   @app.errorhandler(404)
   def not_found(error):
     return jsonify({
@@ -251,6 +224,14 @@ def create_app(test_config=None):
       "error": 404,
       "message": "resource not found"
     }), 404
+  
+  @app.errorhandler(405)
+  def method_not_allowed(error):
+        return jsonify({
+      "success": False, 
+      "error": 405,
+      "message": "method not allowed"
+    }), 405
   
   @app.errorhandler(422)
   def unprocessable(error):
@@ -260,21 +241,13 @@ def create_app(test_config=None):
       "message": "unprocessable error"
   }), 422
 
-  @app.errorhandler(400)
-  def bad_request(error):
+  @app.errorhandler(500)
+  def internal_server_error(error):
     return jsonify({
       "success": False, 
-      "error": 400,
-      "message": "bad request"
-    }), 400
-
-  @app.errorhandler(405)
-  def method_not_allowed(error):
-    return jsonify({
-      "success": False, 
-      "error": 405,
-      "message": "method not allowed"
-    }), 405
+      "error": 500,
+      "message": "internal server error bud"
+    }), 500
 
   return app
 
