@@ -325,6 +325,7 @@ def edit_artist(artist_id):
   form.genres.data = a.genres 
   form.facebook_link.data = a.facebook_link  
   form.image_link.data = a.image_link
+  form.website.data = a.website
 
   artist = {"id":a.id, "name":a.name, "genres": [a.genres], "city": a.city, "state": a.state, "phone": a.phone, "website": a.website,"facebook_link": a.facebook_link, "seeking_venue": a.seeking_venue, "seeking_description": a.seeking_description,"image_link": a.image_link, "past_shows": [],"upcoming_shows":[], "past_shows_count": 0,"upcoming_shows_count": 0}
   return render_template('forms/edit_artist.html', form=form, artist=artist)

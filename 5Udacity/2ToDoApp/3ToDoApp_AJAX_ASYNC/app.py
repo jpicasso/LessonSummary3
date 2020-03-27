@@ -24,7 +24,6 @@ def create_todo():
   error = False
   body = {}
   try:
-    print("I AM TRYING")
     description = request.get_json()['description']
     todo = Todo(description=description)
     db.session.add(todo)
@@ -33,10 +32,8 @@ def create_todo():
       'description': todo.description
     })
   except:
-    print("I AM AN ERROR")
     error = True
     db.session.rollback()
-    print(sys.exc_info())
   finally:
       db.session.close()
   if not error:
