@@ -16,9 +16,6 @@ db_drop_and_create_all()
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    print('hi')
-    # drinks = Drink.query.all()
-    # print(drinks)
     try:
         drinks = ['coffee','tea']
         return jsonify({
@@ -87,6 +84,7 @@ def get_drinks_detail(jwt):
                 ]
         }
     ]
+
     try:
         return jsonify({
             'success': True, 
@@ -106,44 +104,20 @@ def get_drinks_detail(jwt):
 
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
-def post_drinks(jwt):
-    # test 1
-
-    # body = request.get_json()
-    # print(body) 
-    # if body == None:
-    #     abort(404)
+def post_drinks(jwt):    
+    body = request.get_json()
+    if body == None:
+        abort(404)
     
-    # new_recipe = body.get('recipe')
-    # new_title = body.get('title')
-    # new_drink = Drink(title= new_title,recipe=json.dumps(new_recipe))
-    # print(new_drink)
-    # new_drink.insert()
-    # # new_drink = Drink.query.filter_by(id=drink.id).first()
+    new_recipe = body.get('recipe')
+    new_title = body.get('title')
+    new_drink = Drink(id=6, title= new_title,recipe=json.dumps(new_recipe))
+    new_drink.insert()
     
-    # return jsonify({
-    #     'success': True, 
-    #     'drinks': Drink.long(new_drink)
-    # }), 200
-    
-    # test 2
-
-    print('hi')
-    new_recipe = '[{"color": "grey", "name": "stuff", "parts":2}]'
-    try:
-        drink = Drink(title= 'greyMocha',recipe= new_recipe)
-        drink.insert()
-        new_drink = Drink.query.filter_by(id=drink.id).first()
-        print('drink got put in database is:')
-        print(new_drink)
-        return jsonify({
-            'success': True, 
-            'drinks': new_drink.long()
-        }), 200
-        
-    except Exception as e: 
-        print(e)
-        abort(422)
+    return jsonify({
+        'success': True, 
+        'drinks': new_drink.long()
+    }), 200
 
 
 @app.route('/drinks/<drink_id>', methods=['PATCH'])
