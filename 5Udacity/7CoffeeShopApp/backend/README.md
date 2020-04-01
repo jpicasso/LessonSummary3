@@ -41,10 +41,10 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Each time you open a new terminal session, run:
+Each time you open a new terminal session, run from src folder:
 
 ```bash
-export FLASK_APP=api.py;
+export FLASK_APP=api.py
 ```
 
 To run the server, execute:

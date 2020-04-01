@@ -13,12 +13,8 @@ CORS(app)
 
 db_drop_and_create_all()
 
-
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
-    print('hi')
-    # drinks = Drink.query.all()
-    # print(drinks)
     try:
         drinks = ['coffee','tea']
         return jsonify({
@@ -87,13 +83,20 @@ def get_drinks_detail(jwt):
                 ]
         }
     ]
-    try:
-        return jsonify({
-            'success': True, 
-            'drinks': drinks,
-        }), 200
-    except:
-        abort(422)
+    drinks2 = Drink.query.order_by('id').all()
+    drinks3 = Drink.query.get(1)
+
+    print('drinks2')
+    print(drinks2)
+    print('drinks3')
+    print(drinks3)
+
+    return jsonify({
+        'success': True, 
+        'drinks': drinks,
+    }), 200
+
+
 '''
 @TODO implement endpoint
     POST /drinks
@@ -107,38 +110,18 @@ def get_drinks_detail(jwt):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def post_drinks(jwt):
-    # test 1
-
-    # body = request.get_json()
-    # print(body) 
-    # if body == None:
-    #     abort(404)
-    
-    # new_recipe = body.get('recipe')
-    # new_title = body.get('title')
-    # new_drink = Drink(title= new_title,recipe=json.dumps(new_recipe))
-    # print(new_drink)
-    # new_drink.insert()
-    # # new_drink = Drink.query.filter_by(id=drink.id).first()
-    
-    # return jsonify({
-    #     'success': True, 
-    #     'drinks': Drink.long(new_drink)
-    # }), 200
-    
-    # test 2
-
-    print('hi')
-    new_recipe = '[{"color": "grey", "name": "stuff", "parts":2}]'
     try:
-        drink = Drink(title= 'greyMocha',recipe= new_recipe)
+        body = request.get_json()
+        if body == None:
+            abort(404)
+        
+        new_recipe = body.get('recipe')
+        new_title = body.get('title')
+        drink = Drink(title= new_title,recipe= json.dumps(new_recipe))
         drink.insert()
-        new_drink = Drink.query.filter_by(id=drink.id).first()
-        print('drink got put in database is:')
-        print(new_drink)
         return jsonify({
             'success': True, 
-            'drinks': new_drink.long()
+            'drinks': drink.long()
         }), 200
         
     except Exception as e: 
