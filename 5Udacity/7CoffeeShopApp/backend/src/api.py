@@ -17,8 +17,8 @@ db_drop_and_create_all()
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
     print('hi')
-    drinks = Drink.query.all()
-    print(drinks)
+    # drinks = Drink.query.all()
+    # print(drinks)
     try:
         drinks = ['coffee','tea']
         return jsonify({
@@ -31,8 +31,63 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_detail(jwt):
+    drinks = [
+            {
+            'id': 1,
+            'title': 'matcha shake',
+            'recipe': [
+                {
+                    'name': 'milk',
+                    'color': 'grey',
+                    'parts': 1
+                },
+                {
+                    'name': 'matcha',
+                    'color': 'green',
+                    'parts': 3
+                },
+                ]
+        },
+        {
+            'id': 2,
+            'title': 'flatwhite',
+            'recipe': [
+
+                {
+                    'name': 'milk',
+                    'color': 'grey',
+                    'parts': 3
+                },
+                {
+                    'name': 'coffee',
+                    'color': 'brown',
+                    'parts': 1
+                },
+                ]
+        },
+        {
+            'id': 3,
+            'title': 'cap',
+            'recipe': [
+                {
+                    'name': 'foam',
+                    'color': 'white',
+                    'parts': 1
+                },
+                {
+                    'name': 'milk',
+                    'color': 'grey',
+                    'parts': 2
+                },
+                {
+                    'name': 'coffee',
+                    'color': 'brown',
+                    'parts': 1
+                },
+                ]
+        }
+    ]
     try:
-        drinks = ['coffee','tea']
         return jsonify({
             'success': True, 
             'drinks': drinks,
@@ -52,14 +107,34 @@ def get_drinks_detail(jwt):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def post_drinks(jwt):
+    # test 1
 
-    new_recipe = '[{"color": "blue", "name": "stuff", "parts":2}]'
+    # body = request.get_json()
+    # print(body) 
+    # if body == None:
+    #     abort(404)
+    
+    # new_recipe = body.get('recipe')
+    # new_title = body.get('title')
+    # new_drink = Drink(title= new_title,recipe=json.dumps(new_recipe))
+    # print(new_drink)
+    # new_drink.insert()
+    # # new_drink = Drink.query.filter_by(id=drink.id).first()
+    
+    # return jsonify({
+    #     'success': True, 
+    #     'drinks': Drink.long(new_drink)
+    # }), 200
+    
+    # test 2
 
+    print('hi')
+    new_recipe = '[{"color": "grey", "name": "stuff", "parts":2}]'
     try:
-        drink = Drink(title= 'blueMocha',recipe= new_recipe)
-        print('hello')
+        drink = Drink(title= 'greyMocha',recipe= new_recipe)
         drink.insert()
         new_drink = Drink.query.filter_by(id=drink.id).first()
+        print('drink got put in database is:')
         print(new_drink)
         return jsonify({
             'success': True, 
