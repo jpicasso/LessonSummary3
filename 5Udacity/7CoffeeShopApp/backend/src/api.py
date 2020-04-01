@@ -28,7 +28,7 @@ def get_drinks():
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
 def get_drinks_detail(jwt):
-    drinks = [
+    drinks1 = [
             {
             'id': 1,
             'title': 'matcha shake',
@@ -84,11 +84,17 @@ def get_drinks_detail(jwt):
                 ]
         }
     ]
-
+  
     try:
+        drinks2 = Drink.query.order_by('id').all()
+        if drinks2 != []:
+            loaded_drinks = drinks2
+        else:
+            loaded_drinks = drinks1
+
         return jsonify({
             'success': True, 
-            'drinks': drinks,
+            'drinks': loaded_drinks,
         }), 200
     except:
         abort(422)
@@ -105,20 +111,33 @@ def get_drinks_detail(jwt):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def post_drinks(jwt):    
-    body = request.get_json()
-    if body == None:
-        abort(404)
-    
-    new_recipe = body.get('recipe')
-    new_title = body.get('title')
-    new_drink = Drink(id=6, title= new_title,recipe=json.dumps(new_recipe))
-    new_drink.insert()
-    
-    return jsonify({
-        'success': True, 
-        'drinks': new_drink.long()
-    }), 200
+    # try:
+        num_of_drinks = 0
+        drinks = Drink.query.order_by('id').all()
+        if drinks != []:
+            for d in drinks:
+                num_of_drinks += 1
+                print(d)
+                print('num_of_drinks=')
+                print(num_of_drinks)
+        else:
+            print('null')
 
+        body = request.get_json()
+        if body == None:
+            abort(404)
+        
+        new_recipe = body.get('recipe')
+        new_title = body.get('title')
+        new_drink = Drink(id=num_of_drinks, title= new_title,recipe=json.dumps(new_recipe))
+        new_drink.insert()
+        
+        return jsonify({
+            'success': True, 
+            'drinks': new_drink.long()
+        }), 200
+    # except:
+    #     abort(422)
 
 @app.route('/drinks/<drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
