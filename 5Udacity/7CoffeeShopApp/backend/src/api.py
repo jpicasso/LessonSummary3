@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, abort
 from sqlalchemy import exc
 import json
 from flask_cors import CORS
+import ast
 
 from .database.models import db_drop_and_create_all, setup_db, Drink
 from .auth.auth import AuthError, requires_auth
@@ -11,8 +12,7 @@ app = Flask(__name__)
 setup_db(app)
 CORS(app)
 
-db_drop_and_create_all()
-
+# db_drop_and_create_all()
 
 @app.route('/drinks', methods=['GET'])
 def get_drinks():
@@ -27,77 +27,19 @@ def get_drinks():
 
 @app.route('/drinks-detail', methods=['GET'])
 @requires_auth('get:drinks-detail')
-def get_drinks_detail(jwt):
-    drinks1 = [
-            {
-            'id': 1,
-            'title': 'matcha shake',
-            'recipe': [
-                {
-                    'name': 'milk',
-                    'color': 'grey',
-                    'parts': 1
-                },
-                {
-                    'name': 'matcha',
-                    'color': 'green',
-                    'parts': 3
-                },
-                ]
-        },
-        {
-            'id': 2,
-            'title': 'flatwhite',
-            'recipe': [
-
-                {
-                    'name': 'milk',
-                    'color': 'grey',
-                    'parts': 3
-                },
-                {
-                    'name': 'coffee',
-                    'color': 'brown',
-                    'parts': 1
-                },
-                ]
-        },
-        {
-            'id': 3,
-            'title': 'cap',
-            'recipe': [
-                {
-                    'name': 'foam',
-                    'color': 'white',
-                    'parts': 1
-                },
-                {
-                    'name': 'milk',
-                    'color': 'grey',
-                    'parts': 2
-                },
-                {
-                    'name': 'coffee',
-                    'color': 'brown',
-                    'parts': 1
-                },
-                ]
-        }
-    ]
-  
-    try:
-        drinks2 = Drink.query.order_by('id').all()
-        if drinks2 != []:
-            loaded_drinks = drinks2
-        else:
-            loaded_drinks = drinks1
-
-        return jsonify({
+def get_drinks_detail(jwt):  
+    drinks = Drink.query.order_by('id').all()
+    loaded_drinks = []
+    for d in drinks:
+        recipe = ast.literal_eval(d.recipe)
+        new_drink = {'id':d.id, 'title': d.title, 'recipe': recipe}
+        loaded_drinks.append(new_drink)
+    
+    return jsonify({
             'success': True, 
             'drinks': loaded_drinks,
         }), 200
-    except:
-        abort(422)
+
 '''
 @TODO implement endpoint
     POST /drinks
@@ -111,15 +53,12 @@ def get_drinks_detail(jwt):
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def post_drinks(jwt):    
-    # try:
+    try:
         num_of_drinks = 0
         drinks = Drink.query.order_by('id').all()
         if drinks != []:
             for d in drinks:
                 num_of_drinks += 1
-                print(d)
-                print('num_of_drinks=')
-                print(num_of_drinks)
         else:
             print('null')
 
@@ -136,33 +75,54 @@ def post_drinks(jwt):
             'success': True, 
             'drinks': new_drink.long()
         }), 200
-    # except:
-    #     abort(422)
+
+    except:
+        abort(422)
 
 @app.route('/drinks/<drink_id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def patch_drinks(jwt, drink_id):
-    try:
-        edited_drink = ['blue_tea']
-        return jsonify({
+    drink = Drink.query.get(drink_id)
+    print(drink_id)
+    print(drink)
+    body = request.get_json()
+    if body == None:
+        abort(404)
+    
+    # new_recipe = body.get('recipe')
+    # new_title = body.get('title')
+    # new_drink = Drink(id=num_of_drinks, title= new_title,recipe=json.dumps(new_recipe))
+
+    drink.title = body.get('title')
+    drink.recipe = body.get('recipe')
+    return jsonify({
             'success': True, 
-            'drinks': edited_drink,
+            'drinks': drink,
         }), 200
-    except:
-        abort(422)
+
+    # try:
+    #     edited_drink = ['blue_tea']
+    #     return jsonify({
+    #         'success': True, 
+    #         'drinks': edited_drink,
+    #     }), 200
+    # except:
+    #     abort(422)
 
 
 @app.route('/drinks/<drink_id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drinks(jwt, drink_id):
     try:
+        Drink.query.filter_by(id=drink_id).delete()
+        
         return jsonify({
             'success': True, 
             'delete': drink_id,
         }), 200
     except:
         abort(422)
-        
+
 
 ## Error Handling
 @app.errorhandler(422)
