@@ -94,7 +94,7 @@ def unprocessable(error):
                     "success": False, 
                     "error": 404,
                     "message": "resource not found"
-                    }), 404
+                ≈    }), 404
 
 '''
 
