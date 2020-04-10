@@ -7,10 +7,12 @@ import os
 
 from models import setup_db, Question, Category
 
-items_per_page = 5
+items_per_page = 10
 
 
 def searchForIndexes(element, string):
+    ''' returns the positions of element, which is a single character, 
+    that are in string '''
     index_list = []
     for i in range(len(string)):
         if element == string[i]:
@@ -19,6 +21,7 @@ def searchForIndexes(element, string):
 
 
 def searchForWord(search, string):
+    '''returns true if search word is in string'''
     index_list = searchForIndexes(search[0],string)
     if index_list == []:
         return False
@@ -26,6 +29,8 @@ def searchForWord(search, string):
         x = 0
         starting_point = index_list[j]
         for i in range(len(search)):
+            if i+starting_point >= len(string):
+                return False
             if search[i] == string[i+starting_point]:
                 x = x + 1
         if x == len(search):
@@ -59,45 +64,53 @@ def create_app(test_config=None):
         return response
 
     @app.route('/categories', methods=['GET'])
-    def retrieve_categoriess():
-        categories = Category.query.order_by(Category.id).all()
-        if len(categories) == 0:
-            abort(404)
+    def get_categoriess():
+        try:
+            categories = Category.query.order_by(Category.id).all()
+            if len(categories) == 0:
+                abort(404)
 
-        full_list = []
-        
-        for c in categories:
-          full_list.append(c.type)
-        
-        return jsonify({
-            'success': True, 
-            'categories': full_list
-        })
-
+            full_list = []
+            
+            for c in categories:
+                full_list.append(c.type)
+            
+            return jsonify({
+                'success': True, 
+                'categories': full_list
+            })
+        except:
+            abort(422)
 
     @app.route('/questions')
     def retrieve_questions():
-        selection = Question.query.order_by(Question.id).all()
-        current_questions = paginate_questions(request, selection)
+        # try:
+            selection = Question.query.order_by(Question.id).all()
+            current_questions = paginate_questions(request, selection)
+            
+            print('hi')
+            print(selection)
+            print(current_questions)
+            
+            if len(current_questions) == 0:
+                abort(404)
+            
+            categories = Category.query.order_by(Category.id).all()
+            if len(categories) == 0:
+                abort(404)
+            full_list = []
+            for c in categories:
+                full_list.append(c.type)
         
-        if len(current_questions) == 0:
-            abort(404)
-        
-        categories = Category.query.order_by(Category.id).all()
-        if len(categories) == 0:
-            abort(404)
-        full_list = []
-        for c in categories:
-            full_list.append(c.type)
-      
-        return jsonify({
-            'success': True,
-            'questions': current_questions,
-            'total_questions': len(full_list),
-            'categories': full_list,
-            'currentCategory': categories[0].type,
-        })
-    
+            return jsonify({
+                'success': True,
+                'questions': current_questions,
+                'total_questions': len(full_list),
+                'categories': full_list,
+                'currentCategory': categories[0].type,
+            })
+        # except:
+        #     abort(422)    
 
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
@@ -129,11 +142,11 @@ def create_app(test_config=None):
             
             question = body["question"]
             answer = body["answer"]
-            category = body["category"]
+            category = body["category"]+1
             difficulty = body["difficulty"]
-            
+
             new_question = Question(question=question, answer=answer, category=category, difficulty=difficulty)
-            
+                        
             new_question.insert()
 
             return jsonify({
@@ -146,84 +159,90 @@ def create_app(test_config=None):
 
     @app.route('/search', methods=['POST'])
     def search_questions():
-        all_questions = Question.query.order_by(Question.id).all()
-        user_search = request.json.get('searchTerm', "")
-        user_search = user_search.upper()
-        response = {"count":0, "data":[]}
-        # current_cat = 1
-        
-        for q in all_questions:
-            question_str = q.question
-            question_str = question_str.upper()
+        try:
+            all_questions = Question.query.order_by(Question.id).all()
+            user_search = request.json.get('searchTerm', "")
+            user_search = user_search.upper()
+            response = {"count":0, "data":[]}
             
-            if searchForWord(user_search, question_str):
-                new_dictionary = {"id": q.id, "question": q.question,"category": q.category, "difficulty": q.difficulty}
-                # current_cat = q.category
-                response["data"].append(new_dictionary)
-                response["count"] = response["count"]+1
-            
-        return jsonify({
-            'success': True,
-            'questions': response["data"],
-            'totalQuestions': response["count"],
-            # 'currentCategory': current_cat,
-        })
-
+            for q in all_questions:
+                question_str = q.question
+                question_str = question_str.upper()
+                
+                if searchForWord(user_search, question_str):
+                    new_dictionary = {"id": q.id, "question": q.question,"category": q.category, "difficulty": q.difficulty}
+                    response["data"].append(new_dictionary)
+                    response["count"] = response["count"]+1
+                
+            return jsonify({
+                'success': True,
+                'questions': response["data"],
+                'totalQuestions': response["count"],
+            })
+        except:
+            abort(422)
 
     @app.route('/categories/<int:category_id>', methods=['GET'])
     def retrieve_questions_by_categories(category_id):
-        all_questions = Question.query.order_by(Question.id).all()
-        
-        current_category = category_id
-        selection = []
-        for q in all_questions:
-            if q.category == current_category:
-                selection.append(q)
-        
-        current_questions = paginate_questions(request, selection)
-        
-        return jsonify({
-            'success': True, 
-            'questions': current_questions,
-            'totalQuestions': len(current_questions),
-            'currentCategory': current_category,
-        })
+        try:
+            category_id +=1
+            all_questions = Question.query.order_by(Question.id).all()
+            
+            current_category = category_id
+            selection = []
+            for q in all_questions:
+                if q.category == current_category:
+                    selection.append(q)
+            
+            current_questions = paginate_questions(request, selection)
+            
+            return jsonify({
+                'success': True, 
+                'questions': current_questions,
+                'totalQuestions': len(current_questions),
+                'currentCategory': current_category,
+            })
+        except:
+            abort(422)
 
 
     @app.route('/quizzes', methods=['POST'])
     def get_quiz_questions():  
-        prev_questions = request.json.get('previous_questions', "")
-        current_cat = request.json.get('quiz_category', "")
-        all_questions = Question.query.order_by(Question.id).all()
-        filtered_questions = []
-        
-        for a in all_questions:
-            if a.id in prev_questions:
-                pass
-            elif current_cat["id"]==0:
-                filtered_questions.append(a)
-            elif int(a.category) == int(current_cat["id"]):
-                filtered_questions.append(a)
+        try:
+            prev_questions = request.json.get('previous_questions', "")
+            current_cat = request.json.get('quiz_category', "")
             
-        if filtered_questions != []:   
-            num_of_questions = len(filtered_questions)
-            if num_of_questions == 1:
-                x = 0
-            else: 
-                x = random.randint(0,num_of_questions-1)
-            q = filtered_questions[x]
-            current_question = {"id": q.id , "question": q.question,"category": q.category, "difficulty": q.difficulty, "answer":q.answer}
-            prev_questions.append(current_question["id"])
-        else:
-            current_question = {}
+            all_questions = Question.query.order_by(Question.id).all()
+            filtered_questions = []
+            
+            for a in all_questions:
+                if a.id in prev_questions:
+                    pass
+                elif current_cat["id"]==0:
+                    filtered_questions.append(a)
+                elif int(a.category) == int(current_cat["id"])+1:
+                    filtered_questions.append(a)
+                
+            if filtered_questions != []:   
+                num_of_questions = len(filtered_questions)
+                if num_of_questions == 1:
+                    x = 0
+                else: 
+                    x = random.randint(0,num_of_questions-1)
+                q = filtered_questions[x]
+                current_question = {"id": q.id , "question": q.question,"category": q.category, "difficulty": q.difficulty, "answer":q.answer}
+                prev_questions.append(current_question["id"])
+            else:
+                current_question = {}
 
-        return jsonify({
-            'success': True,
-            'previousQuestions': prev_questions,
-            'question': current_question,
-            'guess': '',
-        })
-
+            return jsonify({
+                'success': True,
+                'previousQuestions': prev_questions,
+                'question': current_question,
+                'guess': '',
+            })
+        except:
+            abort(422)
 
     @app.errorhandler(400)
     def bad_request(error):

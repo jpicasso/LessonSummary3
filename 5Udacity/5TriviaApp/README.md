@@ -1,6 +1,22 @@
 # Full Stack API Final Project
 
-## To start the project and the server...run this...
+This app is a trivia game that allows you to:
+
+1) Display questions - both all questions and by category. Questions should show the question, category and difficulty rating by default and can show/hide the answer. 
+2) Delete questions.
+3) Add questions and require that they include question and answer text.
+4) Search for questions based on a text query string.
+5) Play the quiz game, randomizing either all questions or within a specific category. 
+
+## Database Setup (first time only or to reset the db)
+With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
+```bash
+dropdb trivia
+createdb trivia
+psql trivia < trivia.psql
+```
+
+## To start the app and the server...run this...
 
 From the terminal...
 navigate to the backend folder and enter:
@@ -19,12 +35,6 @@ npm install
 npm start
 ```
 Open [http://localhost:3000] to view it in the browser. The page will reload if you make edits.
-
-## Database Setup (first time only or to reset the db)
-With Postgres running, restore a database using the trivia.psql file provided. From the backend folder in terminal run:
-```bash
-psql trivia < trivia.psql
-```
 
 ## Testing
 To run the tests, run the below...make sure to re run every line each time you want to test it
@@ -75,6 +85,40 @@ POST '/quizzes'
 - Purpose: generates 5 random questions from selected category
 - Request Arguments: None
 - Returns: list of previous questions, current questions, and the users guess
+
+### Tech Stack
+
+* **SQLAlchemy ORM** to be our ORM library of choice
+* **PostgreSQL** as our database of choice
+* **Python3** and **Flask** as our server language and server framework
+* **react** is used for the frontend app and was built using create-react-app. It relies on Nodejs and Node Package Manager (NPM). 
+
+### Main Files: Project Structure
+
+  ```sh
+  ├── README.md
+  ├── .gitignore *** dont updload certain files to git
+  ├── backend
+  │   ├── requirements.txt *** The dependencies we need to install with "pip3 install -r requirements.txt"
+  │   ├── flaskr *** includes init.py file with all API endpoints and Controllers
+  │   ├── models.py
+  │   ├── test_flaskr.py
+  │   ├── trivia.psql
+  └── frontend
+      ├── public *** this hold images that are used throughout the frontend; and has `index.html` file and `manifest.json`, which are used to by react to load page 
+      ├── src
+      │   ├── components *** holds js files used to load data onto the webpage and call APIs; includes many key files
+      │   ├── stylesheets *** hold css files
+      │   ├── 
+      └── README.md
+  ```
+
+Key components:
+* Models are located in  `backend/models.py`.
+* Controllers are also located in `backend/flaskr/init.py`.
+* API tests are in `backend/test_flaskr.py`.
+* Connections and calls betweeen frontend and backend are held in js files in  `frontend/src/components` folder.
+
 
 ================================================================================
 Graveyard 
