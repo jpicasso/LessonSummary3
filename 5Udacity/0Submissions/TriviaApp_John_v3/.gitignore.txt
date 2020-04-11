@@ -1,0 +1,3 @@
+backend/venv/
+backend/__pycachce__/
+backend/flaskr/__pycachce__/

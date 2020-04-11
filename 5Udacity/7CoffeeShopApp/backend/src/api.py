@@ -24,7 +24,7 @@ Uncomment the following line to initialize the datbase
 def get_drinks():
     '''
     public endpoint
-    containS only the drink.short() data representation
+    contains only the drink.short() data representation
     returns status code 200 and json {"success": True,
     "drinks": drinks} where drinks is the list of drinks in an
     array format or appropriate status code indicating reason for failure
