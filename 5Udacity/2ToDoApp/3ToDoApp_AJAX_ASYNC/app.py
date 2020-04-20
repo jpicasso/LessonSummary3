@@ -35,7 +35,7 @@ def create_todo():
     error = True
     db.session.rollback()
   finally:
-      db.session.close()
+    db.session.close()
   if not error:
     return jsonify(body)
    

@@ -1,8 +1,10 @@
 terminal commands executed
 
-$ dropdb todoapp
-$ createdb todoapp
-$ FLASK_APP=app.py FLASK_DEBUG=true flask run
+```bash
+dropdb todoapp
+createdb todoapp
+FLASK_APP=app.py FLASK_DEBUG=true flask run
+```
 
 Presss command+shift+d to open a new CLI
 
