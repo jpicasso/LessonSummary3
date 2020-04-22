@@ -1,8 +1,91 @@
-// Last Updated 2020.04.20   
+// Last Updated 2020.04.20B   
 
 $(document).ready(function () {
 
+    function Group(id, name){
+        this.id = id;
+        this.name = name;
+    }
+    var library_group_objects = [];
 
+    updateLocalVarFromDB();
+    function updateLocalVarFromDB() {
+        fetch('/loaddata', {
+            method: 'GET',
+        }).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            var groups = json.groups;
+            for (i = 0; i < groups.length; i++) {
+                var new_group = new Group(groups[i].id, groups[i].name);
+                library_group_objects.push(new_group);
+            }
+            loadGroups();
+        });
+    }
+
+    function loadGroups() {
+        for (i = 0; i < library_group_objects.length; i++) {
+            var rowValue = '#tr' + library_group_objects[i].id;
+            $(rowValue).remove();
+        }
+        for (i = 0; i < library_group_objects.length; i++) {
+            $('#tableGroup').append("<tr id='tr" + library_group_objects[i].id + "'> <td id='td" + library_group_objects[i].id + "' class='span10'> " + library_group_objects[i].name + "</td> <td class='span1'> <button value = '" + library_group_objects[i].id + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + library_group_objects[i].id + "' class='btn-delete'> </button> </td></tr>");
+        }
+    }
+
+
+    function addGroup() {
+        var newGroupName = prompt('Enter group name', 'Enter name here');        
+        fetch('/groups', {
+            method: 'POST',
+            body: JSON.stringify({"name": newGroupName}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            var z = json.id;
+            $('#tableGroup').append("<tr id='tr" + z + "'> <td class='span10'> " + newGroupName + "</td> <td class='span1'> <button value = '" + z + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + z + "' class='btn-delete'> </button> </td></tr>");
+            var newGroup = new Group(z, newGroupName);
+            library_group_objects.push(newGroup);
+        });
+    }
+
+
+    function deleteGroup() {
+        var groupID = $(this).val();        
+        fetch('/groups/' + groupID, {
+            method: 'DELETE'
+        })
+        for (i = 0; i < library_group_objects.length; i++) {
+            if (library_group_objects[i].id == groupID) {
+                var rowValue = '#tr' + groupID;
+                library_group_objects.splice(groupID, 1)
+                $(rowValue).remove();
+            }
+        }
+    }            
+
+    function editGroup() {
+        var groupID = $(this).val();
+        var tdValue = '#td' + groupID;
+        for (i = 0; i < library_group_objects.length; i++) {
+            if (library_group_objects[i].id==groupID) {
+                var new_Name = prompt('Edit group name', library_group_objects[i].name);
+                library_group_objects[i].name = new_Name;
+                $(tdValue).html(library_group_objects[i].name);
+                fetch('/groups/' + groupID, {
+                    method: 'PATCH',
+                    body: JSON.stringify({"name2": new_Name}),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+            }
+        }
+    }
 
 
     //**********************************************************************************
@@ -18,18 +101,7 @@ $(document).ready(function () {
     var library_personGroups_groups = [];
     var library_personGroups_persons = [];
     var library_groups = [];
-    data ='did not work'
-
-    updateLocalstorageFromDB();
-    function updateLocalstorageFromDB() {
-        fetch('/loaddata', {
-            method: 'GET',
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            groups = json.group_data            
-        });
-    }
+    var library_groups_ids = [];
 
 
     updateArraysFromLocal();
@@ -40,7 +112,8 @@ $(document).ready(function () {
         library_persons_notes = JSON.parse(window.localStorage.getItem('library_persons_notes_local'));
         library_personGroups_groups = JSON.parse(window.localStorage.getItem('library_personGroups_groups_local'));
         library_personGroups_persons = JSON.parse(window.localStorage.getItem('library_personGroups_persons_local'));
-        library_groups = JSON.parse(window.localStorage.getItem('library_groups_local'));
+        // library_groups = JSON.parse(window.localStorage.getItem('library_groups_local'));
+        // library_groups_ids = JSON.parse(window.localStorage.getItem('library_groups_local'));
 
         if (library_persons_names == null) {
             restoreDefaultFaceCards();
@@ -50,10 +123,6 @@ $(document).ready(function () {
 
     // restores default arrays when restore default function is called
     function restoreDefaultFaceCards() {
-        
-        fetch('/playgame', {
-            method: 'GET'
-        })
         
         library_persons_pictures = ['url(static/img/faceNodes/tomCruise.png', 'url(static/img/faceNodes/georgeClooney.png', 'url(img/faceNodes/taylorSwift.png', 'url(img/faceNodes/donaldTrump.png', 'url(img/faceNodes/georgeWashington.png', 'url(img/faceNodes/abrahamLincoln.png', 'url(img/faceNodes/henryFord.png', 'url(img/faceNodes/plato.png', 'url(img/faceNodes/socrates.png', 'url(img/faceNodes/aristotle.png', 'url(img/faceNodes/marcusAurellius.png'];
         
@@ -181,106 +250,8 @@ $(document).ready(function () {
     // View / Edit Groups  
     // ***************************************************************************
     // ***************************************************************************
-
-    function addGroup() {
-        //gets group name from user and adds group to library_groups and then adds it to the end of the table
-
-        //*******Need to add verification of group name so that user introduce cross-site scripting */
-        var newGroup = prompt('Enter group name', 'Enter name here');
-        library_groups.push(newGroup);
-        window.localStorage.setItem('library_groups_local', JSON.stringify(library_groups));
-
-        fetch('/groups', {
-            method: 'POST',
-            body: JSON.stringify({"name": newGroup}),
-            headers: {
-            'Content-Type': 'application/json'
-            }
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            alert(json.id)    
-            var z = json.id;
-            $('#tableGroup').append("<tr id='tr" + z + "'> <td class='span10'> " + newGroup + "</td> <td class='span1'> <button value = '" + z + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + z + "' class='btn-delete'> </button> </td></tr>");
-        });
-    }
-
-    loadGroups();
-    function loadGroups() {
-        //builds new group table based on whats in library_groups
-        //assigns edit and delete buttons value based on group Id
-        fetch('/loadgroups', {
-            method: 'GET',
-        }).then(function (response) {
-            return response.json();
-        }).then(function (json) {
-            groups = json.grouplist            
-            for (i = 0; i < groups.length; i++) {
-                $('#tableGroup').append("<tr id='tr" + groups[i].id + "'> <td id='td" + groups[i].id + "' class='span10'> " + groups[i].name + "</td> <td class='span1'> <button value = '" + groups[i].id + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + groups[i].id + "' class='btn-delete'> </button> </td></tr>");
-            }
-            // for (i = 0; i < library_groups.length; i++) {
-            //     $('#tableGroup').append("<tr id='tr" + i + "'> <td id='td" + i + "' class='span10'> " + library_groups[i] + "</td> <td class='span1'> <button value = '" + i + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + i + "' class='btn-delete'> </button> </td></tr>");
-            // }
-            
-        });
-        
-        
-    }
-
-    var rowNumber = 0;
-
-    function deleteGroup() {
-        //capture row value from button input
-        rowNumber = $(this).val();
-        
-        fetch('/groups/' + rowNumber, {
-            method: 'DELETE'
-        })
-        var rowValue = '#tr' + rowNumber;
-        if (rowNumber == library_groups.length - 1) {
-            //use row value to delete the appropriate row the from table 
-            $(rowValue).remove();
-
-            //use row value to delete the appropriate row from the library_groups
-            library_groups.splice(rowNumber, 1);
-
-            //update local storage
-            window.localStorage.setItem('library_groups_local', JSON.stringify(library_groups));
-
-        } else {
-            //delete rowValue from array
-            library_groups.splice(rowNumber, 1);
-
-            //update local storage
-            window.localStorage.setItem('library_groups_local', JSON.stringify(library_groups));
-
-            //first delete all rows currently and then reload all groups
-            // this is to avoid the row id in the table to not match the array value
-            for (i = 0; i < library_groups.length + 1; i++) {
-                var rowValue = '#tr' + i;
-                $(rowValue).remove();
-            }
-            return loadGroups();
-        }
-    }
-
-    //function edits group name
-    function editGroup() {
-        //capture row value from button input
-        rowNumber = $(this).val();
-        var tdValue = '#td' + rowNumber;
-        var editedGroup = prompt('Edit group name', library_groups[rowNumber]);
-
-        //update array
-        library_groups[rowNumber] = editedGroup;
-
-        //update local storage
-        window.localStorage.setItem('library_groups_local', JSON.stringify(library_groups));
-
-        //use row value to edit the appropriate row the from table 
-        $(tdValue).html(library_groups[rowNumber]);
-    }
-
+    
+    
     //**********************************************************************************
     //**********************************************************************************
     // View Persons section 

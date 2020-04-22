@@ -64,19 +64,7 @@ def facecards():
 #     message = {'greeting':'Hello from Flask!'}
 #     return jsonify(message)  
 
-@app.route('/loadgroups', methods=['GET'])
-def loadgroups():
-    groups = Group.query.order_by('id').all()
-    data =[]
-    
-    for g in groups:
-        new_dictionary = {"id": g.id, "name": g.name}
-        data.append(new_dictionary)
 
-    return jsonify({ 
-        'success': True,
-        'grouplist': data
-    })
 
 @app.route('/loaddata', methods=['GET'])
 def loaddata():
@@ -92,6 +80,10 @@ def loaddata():
         'groups': group_data
     })
 
+
+'''
+Groups Controllers
+'''
 
 @app.route('/groups')
 def loadgroups_page():
@@ -122,12 +114,16 @@ def delete_group(group_id):
 def edit_groups(group_id):
     data = request.get_json()
     g = Group.query.get(group_id)
-    g.name = data
-
+    print(g)
+    print(data)
+    g.name = data["name2"]
     db.session.commit()
-    print('success')
-
     return jsonify({ 'success': True })
+
+
+'''
+Persons Controllers
+'''
 
 
 ''' 
