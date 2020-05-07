@@ -68,10 +68,13 @@ terminal commands executed...don't run this in the virtual environment or it won
   ```
 
 4. Run the development server: 
-  ```
+  ```bash
   export FLASK_APP=app.py
   export FLASK_ENV=development
   python3 app.py
+  # or...
+  FLASK_APP=app.py FLASK_DEBUG=true flask run
+
   ```
 
 5. Navigate to Home page [http://localhost:5432]

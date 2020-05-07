@@ -1,12 +1,36 @@
-// Last Updated 2020.04.20B   
+// Last Updated 2020.05.07   
 
 $(document).ready(function () {
+
+
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    // Classes
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     function Group(id, name){
         this.id = id;
         this.name = name;
     }
-    var library_group_objects = [];
+    function Person(id, name, picture, notes){
+        this.id = id;
+        this.name = name;
+        this.picture = picture;
+        this.notes = notes;
+    }
+    function PersonGroup(id, person_id, group_id){
+        this.id = id;
+        this.person_id = person_id;
+        this.group_id = group_id;
+    }
+
+    var groups = [];
+    var persons = [];
+    var person_groups = [];
+
+
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    // Load data from DB to local js variables
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
     updateLocalVarFromDB();
     function updateLocalVarFromDB() {
@@ -15,25 +39,40 @@ $(document).ready(function () {
         }).then(function (response) {
             return response.json();
         }).then(function (json) {
-            var groups = json.groups;
-            for (i = 0; i < groups.length; i++) {
-                var new_group = new Group(groups[i].id, groups[i].name);
-                library_group_objects.push(new_group);
+            var g = json.groups;
+            for (i = 0; i < g.length; i++) {
+                var new_group = new Group(g[i].id, g[i].name);
+                groups.push(new_group);
+            }
+            var p = json.persons;
+            for (i = 0; i < p.length; i++) {
+                var new_person = new Person(p[i].id, p[i].name, p[i].picture, p[i].notes);
+                persons.push(new_person);
+            }
+            var pg = json.person_groups;
+            for (i = 0; i < pg.length; i++) {
+                var new_pg = new PersonGroup(pg[i].id, pg[i].person_id, pg[i].group_id);
+                person_groups.push(new_pg);
             }
             loadGroups();
+            loadPersons();
+            loadPerson();
         });
     }
 
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    // Groups
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
     function loadGroups() {
-        for (i = 0; i < library_group_objects.length; i++) {
-            var rowValue = '#tr' + library_group_objects[i].id;
+        for (i = 0; i < groups.length; i++) {
+            var rowValue = '#tr' + groups[i].id;
             $(rowValue).remove();
         }
-        for (i = 0; i < library_group_objects.length; i++) {
-            $('#tableGroup').append("<tr id='tr" + library_group_objects[i].id + "'> <td id='td" + library_group_objects[i].id + "' class='span10'> " + library_group_objects[i].name + "</td> <td class='span1'> <button value = '" + library_group_objects[i].id + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + library_group_objects[i].id + "' class='btn-delete'> </button> </td></tr>");
+        for (i = 0; i < groups.length; i++) {
+            $('#tableGroup').append("<tr id='tr" + groups[i].id + "'> <td id='td" + groups[i].id + "' class='span10'> " + groups[i].name + "</td> <td class='span1'> <button value = '" + groups[i].id + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + groups[i].id + "' class='btn-delete'> </button> </td></tr>");
         }
     }
-
 
     function addGroup() {
         var newGroupName = prompt('Enter group name', 'Enter name here');        
@@ -49,34 +88,34 @@ $(document).ready(function () {
             var z = json.id;
             $('#tableGroup').append("<tr id='tr" + z + "'> <td class='span10'> " + newGroupName + "</td> <td class='span1'> <button value = '" + z + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + z + "' class='btn-delete'> </button> </td></tr>");
             var newGroup = new Group(z, newGroupName);
-            library_group_objects.push(newGroup);
+            groups.push(newGroup);
         });
     }
 
 
     function deleteGroup() {
-        var groupID = $(this).val();        
-        fetch('/groups/' + groupID, {
+        var group_id = $(this).val();        
+        fetch('/groups/' + group_id, {
             method: 'DELETE'
         })
-        for (i = 0; i < library_group_objects.length; i++) {
-            if (library_group_objects[i].id == groupID) {
-                var rowValue = '#tr' + groupID;
-                library_group_objects.splice(groupID, 1)
+        for (i = 0; i < groups.length; i++) {
+            if (groups[i].id == group_id) {
+                var rowValue = '#tr' + group_id;
+                groups.splice(group_id, 1)
                 $(rowValue).remove();
             }
         }
     }            
 
     function editGroup() {
-        var groupID = $(this).val();
-        var tdValue = '#td' + groupID;
-        for (i = 0; i < library_group_objects.length; i++) {
-            if (library_group_objects[i].id==groupID) {
-                var new_Name = prompt('Edit group name', library_group_objects[i].name);
-                library_group_objects[i].name = new_Name;
-                $(tdValue).html(library_group_objects[i].name);
-                fetch('/groups/' + groupID, {
+        var group_id = $(this).val();
+        var tdValue = '#td' + group_id;
+        for (i = 0; i < groups.length; i++) {
+            if (groups[i].id==group_id) {
+                var new_Name = prompt('Edit group name', groups[i].name);
+                groups[i].name = new_Name;
+                $(tdValue).html(groups[i].name);
+                fetch('/groups/' + group_id, {
                     method: 'PATCH',
                     body: JSON.stringify({"name2": new_Name}),
                     headers: {
@@ -87,445 +126,361 @@ $(document).ready(function () {
         }
     }
 
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    // Persons
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-    //**********************************************************************************
-    //**********************************************************************************
-    // Array / Database Loads  
-    // *********************************************************************************
-    // *********************************************************************************
+    function loadPersons() {
+        for (j = 0; j < groups.length; j++) {
+            //add group table header
+            var classGroup = 'table' + groups[j].name;
+            var classGroupSelector = '.table' + groups[j].name;
+            $('#viewGroups').append("<table class='tablePerson " + classGroup + "'><tr><th colspan=3>" + groups[j].name + " </th></tr> </table>")
+            //add persons to each group
+            //edit person takes you to edit person link page   
+            for (i = 0; i < person_groups.length; i++) {
+                var g_id = person_groups[i].group_id;
+                if (groups[j].id == g_id) {
+                    var p_id = person_groups[i].person_id;
+                    for (k = 0; k < persons.length; k++){
+                        if (persons[k].id == p_id) {
+                            $(classGroupSelector).append("<tr id='tr" + i + "'> <td id='td" + i + "' class='span10'> " + persons[k].name + "</td> <td class='span1'> <button value = '" + person_groups[i].id + "'class='btn-edit'>  </button>  </td> <td class='span1'> <button value = '" + person_groups[i].id + "' class='btn-delete'> </button> </td></tr>");
+                        }
+                    } 
+                }
+            }
+            //add row for adding a person
+            $('#viewGroups').append("<tr id='trAdd'><td class='tableAddRow span10' colspan=2> Add Person </td> <td class='span2'> <button value= '" + groups[j].id + "' class='btn-add addPerson'> </button> <td></tr>");
+        }
+    }
+    
+    function addPerson() {
+        var group_id = $(this).val();
+        var newPersonName = prompt('Enter persons name', 'Enter name here');        
+        var newPersonNotes = prompt('Enter persons notes', 'Enter name here');        
+        var new_person_picture = "url(" + prompt('Enter persons picture', 'Please put a url link to picture')+")";
 
-    // declare global database variables to be used in JS code
-    var library_persons_pictures = [];
-    var library_persons_names = [];
-    var library_persons_notes = [];
-    var library_personGroups_groups = [];
-    var library_personGroups_persons = [];
-    var library_groups = [];
-    var library_groups_ids = [];
+        fetch('/persons', {
+            method: 'POST',
+            body: JSON.stringify({"name": newPersonName, "notes": newPersonNotes, "picture": new_person_picture, "group_id": group_id}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            var p_id = json.person_id;
+            var pg_id = json.person_group_id;
+            var newPerson = new Person(p_id, newPersonName, newPersonPicture, newPersonNotes);
+            var newPersonGroup = new PersonGroup(pg_id, p_id, group_id); 
+            persons.push(newPerson);
+            person_groups.push(newPersonGroup);
+        });
+        location.reload();
+    }
+          
+    // takes user to view / edit person page and loads up that person
+    function editPerson() {
+        var person_group_id = $(this).val(); 
+        var person_id = 0;
+        for (i = 0; i < person_groups.length; i++){
+            if (person_groups[i].id == person_group_id){
+                person_id = person_groups[i].person_id;
+            }
+        }
+        localStorage.setItem('person_id', person_id);
+        window.location.href = "/edit_person";
+    }
 
+    function loadPerson() {
+        var person_id = parseInt(localStorage.getItem('person_id'));
+        for (i = 0; i < persons.length; i++){            
+            if (persons[i].id == person_id){
+                // load name, picture, notes
+                $('#FaceBox-EditNotes-name').html(persons[i].name);
+                $('#FaceBox-EditNotes').text(persons[i].notes);
+                $('#FaceBox-EditFace').css('background-image', persons[i].picture);
+                $('#FaceBox-EditFace').css('background-size', 'cover');
+                $('#FaceBox-EditFace').css('background-position', 'center');
+                $('#FaceBox-EditFace').css('background-repeat', 'no-repeat');
+                $('#FaceBox-EditFace-p').text("");
+                $('#FaceBoxText-notes').text("");
+            }
+        }
+        loadIndividualGroups();
+    }
+   
+    //edit persons pictures 
+    function editPersonPicture() {
+        //prompts user for input and then update array
+        var person_id = parseInt(localStorage.getItem('person_id'));
+        var new_person_picture = '';
+        for (i = 0; i < persons.length; i++){
+            if (persons[i].id == person_id) {
+                new_person_picture = "url(" + prompt("Add or edit full url of website", persons[i].picture)+")";
+                persons[i].picture = new_person_picture;
+                fetch('/persons/' + person_id, {
+                    method: 'PATCH',
+                    body: JSON.stringify({"picture": new_person_picture, "name": persons[i].name, "notes":persons[i].notes}),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+            }
+        }
+        //update picture on page  
+        $('#FaceBox-EditFace').css('background', new_person_picture);
+        $('#FaceBox-EditFace').css('background-size', 'cover');
+        $('#FaceBox-EditFace').css('background-position', 'center');
+        $('#FaceBox-EditFace').css('background-repeat', 'no-repeat');
+        $('#FaceBox-EditFace-p').text("");
+        $('#FaceBoxText-notes').text("");
+    }
 
-    updateArraysFromLocal();
-    //uses local storage to assign new values to arrays
-    function updateArraysFromLocal() {
-        library_persons_pictures = JSON.parse(window.localStorage.getItem('library_persons_pictures_local'));
-        library_persons_names = JSON.parse(window.localStorage.getItem('library_persons_names_local'));
-        library_persons_notes = JSON.parse(window.localStorage.getItem('library_persons_notes_local'));
-        library_personGroups_groups = JSON.parse(window.localStorage.getItem('library_personGroups_groups_local'));
-        library_personGroups_persons = JSON.parse(window.localStorage.getItem('library_personGroups_persons_local'));
-        // library_groups = JSON.parse(window.localStorage.getItem('library_groups_local'));
-        // library_groups_ids = JSON.parse(window.localStorage.getItem('library_groups_local'));
+    //edit persons name and then fill in the page
+    function editPersonName() {
+        var person_id = parseInt(localStorage.getItem('person_id'));
+        var new_person_name = '';
+        for (i = 0; i < persons.length; i++){
+            if (persons[i].id == person_id) {
+                new_person_name = prompt("Edit person's name: ", persons[i].name);
+                persons[i].name = new_person_name;
+                fetch('/persons/' + person_id, {
+                    method: 'PATCH',
+                    body: JSON.stringify({"picture": persons[i].picture, "name": new_person_name, "notes": persons[i].notes}),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+            }
+        }
+        $('#FaceBox-EditNotes-name').html(new_person_name);
+    }
 
-        if (library_persons_names == null) {
-            restoreDefaultFaceCards();
-            updateArraysFromLocal();
+    //edit persons notes and then fill in the page
+    function editPersonNotes() {
+        var person_id = parseInt(localStorage.getItem('person_id'));
+        var new_person_notes = '';
+        for (i = 0; i < persons.length; i++){
+            if (persons[i].id == person_id) {
+                new_person_notes = prompt("Edit person's notes: ", persons[i].notes);
+                persons[i].note = new_person_notes;
+                fetch('/persons/' + person_id, {
+                    method: 'PATCH',
+                    body: JSON.stringify({"picture": persons[i].picture, "name": persons[i].name, "notes": new_person_notes}),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+            }
+        }
+        $('#FaceBox-EditNotes').html(new_person_notes);
+    }
+
+    function deletePerson() {
+        var x = prompt('type "yes" to confirm', 'type yes here');
+        if (x == "yes") {   
+            var person_id = parseInt(localStorage.getItem('person_id'));
+            fetch('/persons/' + person_id, {
+                method: 'DELETE'
+            })
+            for (i = 0; i < person_groups.length; i++){
+                if (person_groups[i].person_id == person_id){
+                    fetch('/person_groups/' + person_groups[i].id, {
+                        method: 'DELETE'
+                    })        
+                }
+            }
+            window.location.href = '/persons';
+        }
+    }   
+    
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    // Person_Groups
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+    function deletePersonsGroup() {
+        var person_group_id = $(this).val();        
+        fetch('/person_groups/' + person_group_id, {
+            method: 'DELETE'
+        })
+        location.reload();        
+    }  
+
+    function loadIndividualGroups(){
+        var person_id = parseInt(localStorage.getItem('person_id'));
+        for (i = 0; i < person_groups.length; i++) {
+            if (person_groups[i].person_id == person_id) {
+                var group_id = person_groups[i].group_id;
+                for (j = 0; j < groups.length; j++) {
+                    if (group_id == groups[j].id){
+                        var group_name = groups[j].name;
+                        $('#tableIndividualPersonsGroups').append("<tr id='tr" + group_id + "'> <td id='td" + group_id + "' class='span10'> " + group_name + "</td> <td class='span2'> <button value = '" + group_id + "' class='btn-delete'> </button> </td></tr>");
+                    }
+                }
+            }
+        }
+        
+        // adds group options to add group on individual page
+        for (i = 0; i < groups.length; i++) {
+            $('#addIndividualsGroup').append('<option value="' + groups[i].id +'">' + groups[i].name + '</option>');
         }
     }
 
-    // restores default arrays when restore default function is called
-    function restoreDefaultFaceCards() {
-        
-        library_persons_pictures = ['url(static/img/faceNodes/tomCruise.png', 'url(static/img/faceNodes/georgeClooney.png', 'url(img/faceNodes/taylorSwift.png', 'url(img/faceNodes/donaldTrump.png', 'url(img/faceNodes/georgeWashington.png', 'url(img/faceNodes/abrahamLincoln.png', 'url(img/faceNodes/henryFord.png', 'url(img/faceNodes/plato.png', 'url(img/faceNodes/socrates.png', 'url(img/faceNodes/aristotle.png', 'url(img/faceNodes/marcusAurellius.png'];
-        
-        //reset local storage
-        window.localStorage.setItem('library_persons_pictures_local', JSON.stringify(library_persons_pictures));
-        
-        library_persons_names = ['John Picasso', 'George Clooney', 'Taylor Swift', 'Donald Trump', 'George Washington', 'Abraham Lincoln', 'Henry Ford', 'Plato', 'Socrates', 'Aristotle', 'Marcus Aurellius'];
-
-        //reset local storage
-        window.localStorage.setItem('library_persons_names_local', JSON.stringify(library_persons_names));
-
-        library_persons_notes = ['Wife: Katie Holmes 2006-12, Nicole Kidman 1990-01; Movies: Risky Business (83), Top Gun (86), Rain Man (88), Days of Thunder (90), A few Good Men (92), Vanilla Sky (01), Minority Report (02), The Last Samurai (03)', 'Wife: Amal (since 2014); Movies: From Dusk til Dawn (96), The Perfect Storm (00), Oceans Eleven (01), Up in the Air (09), The Ides of March (11), Gravity (13)', 'Height: 510; Birthday: Dec 13, 1989; Born in Reading, PA', '45th president of the U.S.; 63; Born 1946; Wife - Melania; Children: Donald Jr, Ivanka, Eric, Tiffany, Barron', '1st president of the U.S. (from 1789 to 1797', '16th president of U.S. (1861 until assassinated in 1865)', '(1863-1947) - Founder of Ford and developed the assembly line system for car mass production (didnt invent it though); President of Ford 1906-1919 and 43-45; Model T was first car; Published antisemitic book (The International Jew)', '(428 BC - 348 BC) Founded first school for higher thought; Wrote Symposium and Republic; Student of Socrates', '(470 - 399 BC) Executed by drinking Hemlock; Socratic Method = solve a problem by breaking it into smaller questions; "the unexamined life is not worth living"', '(384-322 BC) Student of Plato from age 17 (joined Platos Academy); Tutored Alexander the Great beginning in 343 BC', '(121-180) - Roman Emperor from 161-180; Stoic philosopher; Last of the Five Great Emperors; Son - Commodus (emperor from 177-192)'];
-
-        //reset local storage
-        window.localStorage.setItem('library_persons_notes_local', JSON.stringify(library_persons_notes));
-
-        library_personGroups_groups = ['Celebrities', 'Celebrities', 'Celebrities', 'Celebrities', 'USHistory', 'USHistory', 'USHistory', 'USHistory', 'Philosophers', 'Philosophers', 'Philosophers', 'Philosophers'];
-
-        //reset local storage
-        window.localStorage.setItem('library_personGroups_groups_local', JSON.stringify(library_personGroups_groups));
-
-        library_personGroups_persons = ['0', '1', '2', '3', '3', '4', '5', '6', '7', '8', '9', '10'];
-
-        //reset local storage
-        window.localStorage.setItem('library_personGroups_persons_local', JSON.stringify(library_personGroups_persons));
-
-        library_groups = ['NotAssigned', 'Celebrities', 'USHistory', 'Philosophers']
-
-        //reset local storage
-        window.localStorage.setItem('library_groups_local', JSON.stringify(library_groups));
-
-        //refreshes page
-        location.reload();
+    function addIndividualGroup() {
+        var person_id = parseInt(localStorage.getItem('person_id'));
+        var group_id = $(this).val();
+        var new_group_name = 'whoops';
+        for (i = 0; i < groups.length; i++){
+            if (groups[i].id == group_id){
+                new_group_name = groups[i].name;
+            }
+        }
+        fetch('/person_groups', {
+            method: 'POST',
+            body: JSON.stringify({"person_id": person_id, "group_id": group_id}),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            var new_person_group_id = json.id;
+            var new_person_group = new PersonGroup(new_person_group_id, person_id, group_id);
+            person_groups.push(new_person_group);
+            $('#tableIndividualPersonsGroups').append("<tr id='tr" + group_id + "'> <td id='td" + group_id + "' class='span10'> " + new_group_name + "</td> <td class='span2'> <button value = '" + group_id + "' class='btn-delete'> </button> </td></tr>");
+        });
     }
+
+    function deleteIndividualGroup() {    
+        var person_group_id = $(this).val();
+        var person_id = parseInt(localStorage.getItem('person_id'));
+
+        // delete person_group from table
+        var rowValue = '#tr' + person_group_id;
+        $(rowValue).remove();
+
+        fetch('/person_groups/' + person_group_id, {
+            method: 'DELETE'
+        })
+       
+        // if person has no more person_groups, then add NotAssigned group
+        var num_of_groups = 0;
+        for (i = 0; i < person_groups.length; i++) {
+            if (person_groups[i].person_id == person_id) {
+                num_of_groups ++;
+            } 
+        }
+        if (num_of_groups == 0) {
+            var new_group_id = 4;
+            fetch('/person_groups/', {
+                method: 'POST',
+                body: JSON.stringify({"person_id": person_id, "group_id": new_group_id}),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(function (response) {
+                return response.json();
+            }).then(function (json) {
+                var new_person_group_id = json.id;
+                var new_person_group = new PersonGroup(new_person_group_id, person_id, new_group_id)
+                person_groups.push(new_person_group);
+            });
+        }
+    }    
+
+
+    //**********************************************************************************
+    // LEFT OFF HERE
+    // ********************************************************************************
 
     //**********************************************************************************
     //**********************************************************************************
     // Face Cards....flash cards engine  
     // *********************************************************************************
-    // *********************************************************************************
-    var x = 0;
-    var faceOrNotes = 'notes';
+    // // *********************************************************************************
+    // var x = 0;
+    // var faceOrNotes = 'notes';
 
-    // temporary global variables to store names that have been selected within the group
-    var selectedFaceGroups = [];
-    var selectedPictures = [];
-    var selectedNames = [];
-    var selectedNotes = [];
+    // // temporary global variables to store names that have been selected within the group
+    // var selectedFaceGroups = [];
+    // var selectedPictures = [];
+    // var selectedNames = [];
+    // var selectedNotes = [];
 
-    //Change Picture when you press next button
-    function changePicture() {
-        event.preventDefault();
-        faceOrNotes = 'face';
-        $('#FaceBox').css('background', selectedPictures[x]);
-        $('#FaceBox').css('background-size', 'cover');
-        $('#FaceBox').css('background-position', 'center');
-        $('#FaceBox').css('background-repeat', 'no-repeat');
-        $('#FaceBoxText').text("");
-        $('#FaceBoxText-notes').text("");
-    }
+    // //Change Picture when you press next button
+    // function changePicture() {
+    //     event.preventDefault();
+    //     faceOrNotes = 'face';
+    //     $('#FaceBox').css('background', selectedPictures[x]);
+    //     $('#FaceBox').css('background-size', 'cover');
+    //     $('#FaceBox').css('background-position', 'center');
+    //     $('#FaceBox').css('background-repeat', 'no-repeat');
+    //     $('#FaceBoxText').text("");
+    //     $('#FaceBoxText-notes').text("");
+    // }
 
-    function changeNote() {
-        event.preventDefault();
-        faceOrNotes = 'notes';
-        $('#FaceBox').css('background', '');
-        $('#FaceBoxText').text(selectedNames[x]);
-        $('#FaceBoxText-notes').text(selectedNotes[x]);
-        $('#FaceBox').attr('class', 'textWindow');
-        if (x == selectedNames.length - 1) {
-            x = 0;
-        } else {
-            x = x + 1;
-        }
-    }
-    function runNextFace() {
-        if (faceOrNotes == 'face') {
-            return changeNote();
-        } else {
-            return changePicture();
-        }
-    }
+    // function changeNote() {
+    //     event.preventDefault();
+    //     faceOrNotes = 'notes';
+    //     $('#FaceBox').css('background', '');
+    //     $('#FaceBoxText').text(selectedNames[x]);
+    //     $('#FaceBoxText-notes').text(selectedNotes[x]);
+    //     $('#FaceBox').attr('class', 'textWindow');
+    //     if (x == selectedNames.length - 1) {
+    //         x = 0;
+    //     } else {
+    //         x = x + 1;
+    //     }
+    // }
+    // function runNextFace() {
+    //     if (faceOrNotes == 'face') {
+    //         return changeNote();
+    //     } else {
+    //         return changePicture();
+    //     }
+    // }
 
-    //get selected groups and load them from the library to the selected groups
-    function getSelectedFaceGroups() {
-        x = 0;
-        selectedFaceGroups = [];
-        selectedPictures = [];
-        selectedNames = [];
-        selectedNotes = [];
+    // //get selected groups and load them from the library to the selected groups
+    // function getSelectedFaceGroups() {
+    //     x = 0;
+    //     selectedFaceGroups = [];
+    //     selectedPictures = [];
+    //     selectedNames = [];
+    //     selectedNotes = [];
 
-        var formFaceVar = document.forms[0];
-        var i;
-        //loops through each checkbox to see if selected and then adds selected check boxes to the array selectedFaceGroups
-        for (i = 0; i < formFaceVar.length; i++) {
-            if (formFaceVar[i].checked) {
-                selectedFaceGroups.push(formFaceVar[i].value);
-            }
-        }
+    //     var formFaceVar = document.forms[0];
+    //     var i;
+    //     //loops through each checkbox to see if selected and then adds selected check boxes to the array selectedFaceGroups
+    //     for (i = 0; i < formFaceVar.length; i++) {
+    //         if (formFaceVar[i].checked) {
+    //             selectedFaceGroups.push(formFaceVar[i].value);
+    //         }
+    //     }
 
-        // goes through each selected category
-        for (y = 0; y < selectedFaceGroups.length; y++) {
-            //checks entire library of person groups to see if selected category is there and then uses the personID to adds pictures from library to selected arrays if it is  
-            for (z = 0; z < library_personGroups_groups.length; z++) {
-                if (selectedFaceGroups[y] == library_personGroups_groups[z]) {
-                    var v = library_personGroups_persons[z];
-                    selectedPictures.push(library_persons_pictures[v]);
-                    selectedNames.push(library_persons_names[v]);
-                    selectedNotes.push(library_persons_notes[v]);
-                }
-            }
-        }
-    }
+    //     // goes through each selected category
+    //     for (y = 0; y < selectedFaceGroups.length; y++) {
+    //         //checks entire library of person groups to see if selected category is there and then uses the person_id to adds pictures from library to selected arrays if it is  
+    //         for (z = 0; z < library_pg_groups.length; z++) {
+    //             if (selectedFaceGroups[y] == library_pg_groups[z]) {
+    //                 var v = library_pg_persons[z];
+    //                 selectedPictures.push(library_persons_pictures[v]);
+    //                 selectedNames.push(library_persons_names[v]);
+    //                 selectedNotes.push(library_persons_notes[v]);
+    //             }
+    //         }
+    //     }
+    // }
 
-    //load form section function to reload all checkboxes"
-    loadGroupsToFaceCards();
-    function loadGroupsToFaceCards() {
-        for (i = 0; i < library_groups.length; i++) {
-            $('#groups').append("<label class='CheckBoxContainer'> " + library_groups[i]
-                + "<input type='checkbox' name='categories' value='" + library_groups[i] + "'> <span class='checkmark'></span></label>");
-        }
-    }
+    // //load form section function to reload all checkboxes"
+    // loadGroupsToFaceCards();
+    // // function loadGroupsToFaceCards() {
+    // //     for (i = 0; i < library_groups.length; i++) {
+    // //         $('#groups').append("<label class='CheckBoxContainer'> " + library_groups[i]
+    // //             + "<input type='checkbox' name='categories' value='" + library_groups[i] + "'> <span class='checkmark'></span></label>");
+    // //     }
+    // // }
 
-    //****************************************************************************
-    //****************************************************************************
-    // View / Edit Groups  
-    // ***************************************************************************
-    // ***************************************************************************
-    
-    
-    //**********************************************************************************
-    //**********************************************************************************
-    // View Persons section 
-    // *********************************************************************************
-    // *********************************************************************************
-
-    //function loadPersons creates a new table for each group of people and adds all listed persons to that group in seperate rows
-    //Assigns identifiers to tables based on library_groups and assigns identifiers to table rows based on library_personGroups_groups
-
-    loadPersons();
-    function loadPersons() {
-        for (j = 0; j < library_groups.length; j++) {
-            //add group table header
-            var classGroup = 'table' + library_groups[j];
-            var classGroupSelector = '.table' + library_groups[j];
-            $('#viewGroups').append("<table class='tablePerson " + classGroup + "'><tr><th colspan=3>" + library_groups[j] + " </th></tr> </table>")
-            //add persons to each group
-            //edit person takes you to edit person link page
-            for (i = 0; i < library_personGroups_groups.length; i++) {
-                if (library_groups[j] == library_personGroups_groups[i]) {
-                    $(classGroupSelector).append("<tr id='tr" + i + "'> <td id='td" + i + "' class='span10'> " + library_persons_names[library_personGroups_persons[i]] + "</td> <td class='span1'> <button value = '" + i + "'class='btn-edit'>  </button>  </td> <td class='span1'> <button value = '" + i + "' class='btn-delete'> </button> </td></tr>");
-                }
-            }
-            //add row for adding a person
-            //add person takes you to edit person link
-            $('#viewGroups').append("<tr id='trAdd'><td class='tableAddRow span10' colspan=2> Add Person </td> <td class='span2'> <button value= '" + library_groups[j] + "' class='btn-add addPerson'> </button> <td></tr>");
-        }
-    }
-
-    //function deletePersonsGroup deletes individual from library_personGroups_groups, then deletes all tables, then reloads table with updated library_personGroups_groups using the loadPersons function
-    function deletePersonsGroup() {
-        //capture row value from button input
-        rowNumber = $(this).val();
-        var rowValue = '#tr' + rowNumber;
-        individualsId = library_personGroups_persons[rowNumber];
-
-        //delete rowValue from array
-        library_personGroups_groups.splice(rowNumber, 1);
-        library_personGroups_persons.splice(rowNumber, 1);
-
-        //if person no longer is any groups, put them in uassigned
-        assignNAtoPersonsGroups();
-
-        //update local storage
-        window.localStorage.setItem('library_personGroups_groups_local', JSON.stringify(library_personGroups_groups));
-        window.localStorage.setItem('library_personGroups_persons_local', JSON.stringify(library_personGroups_persons));
-
-        // delete all rows with persons in them
-        for (i = 0; i < library_personGroups_groups.length + 1; i++) {
-            var rowValue = '#tr' + i;
-            $(rowValue).remove();
-        }
-        // delete all table group headers
-        for (j = 0; j < library_groups.length; j++) {
-            var classGroup = '.table' + library_groups[j];
-            $(classGroup).remove();
-            $('#trAdd').remove();
-        }
-
-        //then reload all rows and persons
-        loadPersons();
-    }
-
-    function assignNAtoPersonsGroups() {
-        //if person no longer is any groups, put them in uassigned
-        console.log(individualsId);
-        for (i = 0; i < library_personGroups_groups.length; i++) {
-            if (library_personGroups_persons[i] == individualsId) {
-                return; 
-            } else if (i == library_personGroups_groups.length-1) {
-                library_personGroups_groups.push('NotAssigned');
-                library_personGroups_persons.push(individualsId);
-            }
-        }
-    }
-
-    //**********************************************************************************
-    //**********************************************************************************
-    // Edit / Add Persons section 
-    // ********************************************************************************
-    // ********************************************************************************
-
-    //get individuals ID when loading individuals page
-    var individualsId = 0;
-    function loadIndividualsGroups() {
-        //builds new individual tablegroup table based on whats in library_personGroups_groups
-        //assigns delete buttons value based on group Id
-        for (i = 0; i < library_personGroups_persons.length; i++) {
-            if (library_personGroups_persons[i] == individualsId) {
-                $('#tableIndividualPersonsGroups').append("<tr id='tr" + i + "'> <td id='td" + i + "' class='span10'> " + library_personGroups_groups[i] + "</td> <td class='span2'> <button value = '" + i + "' class='btn-delete'> </button> </td></tr>");
-            }
-        }
-    }
-
-    function addIndividualGroup() {
-        //adds values to the PersonsGroup table...library_personGroups_persons and library_personGroups_groups
-        var newIndividualsGroup = $("#addIndividualsGroup").val();
-        library_personGroups_groups.push(newIndividualsGroup);
-        library_personGroups_persons.push(individualsId);
-
-        //update local storage
-        window.localStorage.setItem('library_personGroups_groups_local', JSON.stringify(library_personGroups_groups));
-        window.localStorage.setItem('library_personGroups_persons_local', JSON.stringify(library_personGroups_persons));
-
-        //then deletes the table and reloads it
-        // delete all rows
-        for (i = 0; i < library_personGroups_groups.length + 1; i++) {
-            var rowValue = '#tr' + i;
-            $(rowValue).remove();
-        }
-        //reload table
-        return loadIndividualsGroups();
-
-    }
-    function deleteIndividualGroup() {
-        //delete values of the PersonsGroup table...library_personGroups_persons and library_personGroups_groups
-        //then deletes the table and reloads it
-
-        //capture row value from button input
-        rowNumber = $(this).val();
-        var rowValue = '#tr' + rowNumber;
-
-        //delete rowValue from array
-        library_personGroups_groups.splice(rowNumber, 1);
-        library_personGroups_persons.splice(rowNumber, 1);
-
-        assignNAtoPersonsGroups();
-
-        //update local storage
-        window.localStorage.setItem('library_personGroups_groups_local', JSON.stringify(library_personGroups_groups));
-        window.localStorage.setItem('library_personGroups_persons_local', JSON.stringify(library_personGroups_persons));
-
-        // delete all rows
-        for (i = 0; i < library_personGroups_groups.length + 1; i++) {
-            var rowValue = '#tr' + i;
-            $(rowValue).remove();
-        }
-
-        //then reload all rows and persons
-        return loadIndividualsGroups();
-    }
-
-    //adds group options to add group on individual page
-    for (i = 0; i < library_groups.length; i++) {
-        $('#addIndividualsGroup').append('<option>' + library_groups[i] + '</option>');
-    }
-
-    // takes user to view / edit person page and loads up that person
-    function editPerson() {
-        // get value of which person was clicked
-        individualsId = library_personGroups_persons[$(this).val()];
-        window.localStorage.setItem('individualsID_local', individualsId)
-        //takes user to view /edit person page
-        window.location.href = 'FaceCardsEditPerson.html';
-        //loads up that person
-        loadIndividual();
-    }
-
-    loadIndividual();
-    //takes variable from library_personGroups_persons and loads picture, name, notes, and groups
-    function loadIndividual() {
-        individualsId = window.localStorage.getItem('individualsID_local');
-        // load picture
-        $('#FaceBox-EditFace').css('background', library_persons_pictures[individualsId]);
-        $('#FaceBox-EditFace').css('background-size', 'cover');
-        $('#FaceBox-EditFace').css('background-position', 'center');
-        $('#FaceBox-EditFace').css('background-repeat', 'no-repeat');
-        $('#FaceBox-EditFace-p').text("");
-        $('#FaceBoxText-notes').text("");
-
-        // load name and notes
-        $('#FaceBox-EditNotes-name').html(library_persons_names[individualsId]);
-        $('#FaceBox-EditNotes').text(library_persons_notes[individualsId]);
-
-        //load groups
-        return loadIndividualsGroups();
-    }
-
-    //edit persons name and then fill in the page
-    function editPersonName() {
-        //prompts user for input and then update array
-        library_persons_names[individualsId] = prompt("Edit Person's Name", library_persons_names[individualsId]);
-
-        //update local storage
-        window.localStorage.setItem('library_persons_names_local', JSON.stringify(library_persons_names));
-
-        //update name on page  
-        $('#FaceBox-EditNotes-name').html(library_persons_names[individualsId]);
-    }
-
-    //edit persons notes and then fill in the page
-    function editPersonNotes() {
-        //prompts user for input and then update array
-        library_persons_notes[individualsId] = prompt("Edit Person's Notes", library_persons_notes[individualsId]);
-
-        //update local storage
-        window.localStorage.setItem('library_persons_notes_local', JSON.stringify(library_persons_notes));
-
-        //update name on page  
-        $('#FaceBox-EditNotes').html(library_persons_notes[individualsId]);
-    }
-
-    //edit persons pictures 
-    function editPersonPicture() {
-        //prompts user for input and then update array
-        library_persons_pictures[individualsId] = "url(" + prompt("Edit full url of website", library_persons_pictures[individualsId]);
-
-        //update local storage
-        window.localStorage.setItem('library_persons_pictures_local', JSON.stringify(library_persons_pictures));
-
-        //update picture on page  
-        $('#FaceBox-EditFace').css('background', library_persons_pictures[individualsId]);
-        $('#FaceBox-EditFace').css('background-size', 'cover');
-        $('#FaceBox-EditFace').css('background-position', 'center');
-        $('#FaceBox-EditFace').css('background-repeat', 'no-repeat');
-        $('#FaceBox-EditFace-p').text("");
-        $('#FaceBoxText-notes').text("");
-    }
-
-    //use a series of prompts to get info about new person
-    function addPerson() {
-        //create new individual ID and put at end of persons table
-        individualsId = library_persons_names.length + 1;
-
-        //update local storage with new individualID
-        window.localStorage.setItem('individualsID_local', individualsId)
-
-        //adds values to the PersonsGroup table...library_personGroups_persons and library_personGroups_groups
-        var newIndividualsGroup = $(this).val();
-        library_personGroups_groups.push(newIndividualsGroup);
-        library_personGroups_persons.push(individualsId);
-
-        //update local storage
-        window.localStorage.setItem('library_personGroups_groups_local', JSON.stringify(library_personGroups_groups));
-        window.localStorage.setItem('library_personGroups_persons_local', JSON.stringify(library_personGroups_persons));
-
-        editPersonName();
-        editPersonNotes();
-        editPersonPicture();
-
-        //takes user to view /edit person page
-        window.location.href = 'FaceCardsEditPerson.html';
-    }
-
-
-    //deletes person from person db and personGroups db
-    function deletePerson() {
-        var x = prompt('type "yes" to confirm', 'type yes here');
-        if (x == "yes") {
-            //delete invidiuals from all persons tables and personGroups tables
-            library_persons_pictures.splice(individualsId, 1);
-            library_persons_names.splice(individualsId, 1);
-            library_persons_notes.splice(individualsId, 1);
-
-            //loop through persons groups and delete all rows with the person in it
-            for (i = 0; i < library_personGroups_groups.length + 1; i++) {
-                if (library_personGroups_persons[i] == individualsId) {
-                    library_personGroups_groups.splice(i, 1);
-                    library_personGroups_persons.splice(i, 1);
-                }
-            }
-
-            //update local storage
-            window.localStorage.setItem('library_personGroups_groups_local', JSON.stringify(library_personGroups_groups));
-            window.localStorage.setItem('library_personGroups_persons_local', JSON.stringify(library_personGroups_persons));
-            window.localStorage.setItem('library_persons_pictures_local', JSON.stringify(library_persons_pictures));
-            window.localStorage.setItem('library_persons_notes_local', JSON.stringify(library_persons_notes));
-            window.localStorage.setItem('library_persons_names_local', JSON.stringify(library_persons_names));
-
-            //takes user to view Persons page
-            window.location.href = 'FaceCardsPersons.html';
-        }
-
-    }
 
     //**********************************************************************************
     //**********************************************************************************
@@ -533,10 +488,10 @@ $(document).ready(function () {
     // ********************************************************************************
     // ********************************************************************************
 
-    // Buttons on FaceCards page
-    $('#nextFace').click(runNextFace);
-    $('#groups').change(getSelectedFaceGroups);
-    $('.formSection').on('change', '#groups', getSelectedFaceGroups);
+    // // Buttons on FaceCards page
+    // $('#nextFace').click(runNextFace);
+    // $('#groups').change(getSelectedFaceGroups);
+    // $('.formSection').on('change', '#groups', getSelectedFaceGroups);
 
 
     //Buttons on FaceCardsGroups page
@@ -555,12 +510,5 @@ $(document).ready(function () {
     $('#FaceBox-EditFace').on('click', '.btn-edit', editPersonPicture);
     $('#btn-faceBox-name').click(editPersonName);
     $('#btn-faceBox-notes').click(editPersonNotes);
-    $('#btn-restoreDefaults').click(restoreDefaultFaceCards);
     $('#btn-faceBox-deletePerson').click(deletePerson);
 })
-
-   //**********************************************************************************
-    // LEFT OFF HERE
-    // ********************************************************************************
-
-
