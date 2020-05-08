@@ -1,4 +1,4 @@
-// Last Updated 2020.05.07   
+// Last Updated 2020.05.08   
 
 $(document).ready(function () {
 
@@ -71,6 +71,9 @@ $(document).ready(function () {
         }
         for (i = 0; i < groups.length; i++) {
             $('#tableGroup').append("<tr id='tr" + groups[i].id + "'> <td id='td" + groups[i].id + "' class='span10'> " + groups[i].name + "</td> <td class='span1'> <button value = '" + groups[i].id + "'class='btn-edit'> </button> </td> <td class='span1'> <button value = '" + groups[i].id + "' class='btn-delete'> </button> </td></tr>");
+        }
+        for (i = 0; i < groups.length; i++) {
+            $('#groups').append("<label class='CheckBoxContainer'> " + groups[i].name + "<input type='checkbox' name='categories' value='" + groups[i].id + "'> <span class='checkmark'></span></label>");
         }
     }
 
@@ -212,7 +215,7 @@ $(document).ready(function () {
    
     //edit persons pictures 
     function editPersonPicture() {
-        //prompts user for input and then update array
+        //prompts user for input and then updates array
         var person_id = parseInt(localStorage.getItem('person_id'));
         var new_person_picture = '';
         for (i = 0; i < persons.length; i++){
@@ -278,8 +281,8 @@ $(document).ready(function () {
     }
 
     function deletePerson() {
-        var x = prompt('type "yes" to confirm', 'type yes here');
-        if (x == "yes") {   
+        var confirmed = prompt('type "yes" to confirm', 'type yes here');
+        if (confirmed == "yes") {   
             var person_id = parseInt(localStorage.getItem('person_id'));
             fetch('/persons/' + person_id, {
                 method: 'DELETE'
@@ -389,110 +392,94 @@ $(document).ready(function () {
         }
     }    
 
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    // Face Cards Engine
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-    //**********************************************************************************
-    // LEFT OFF HERE
-    // ********************************************************************************
+    // temporary global variables to store names that have been selected within the group
+    var card_num = 0;
+    var faceOrNotes = 'notes';
+    var selected_groups = [];
+    var selected_pictures = [];
+    var selected_names = [];
+    var selected_notes = [];
 
-    //**********************************************************************************
-    //**********************************************************************************
-    // Face Cards....flash cards engine  
-    // *********************************************************************************
-    // // *********************************************************************************
-    // var x = 0;
-    // var faceOrNotes = 'notes';
+    //get selected groups and load them and associate people into the selected arrays
+    function getSelectedFaceGroups() {
+        card_num = 0;
+        selected_groups = [];
+        selected_pictures = [];
+        selected_names = [];
+        selected_notes = [];
 
-    // // temporary global variables to store names that have been selected within the group
-    // var selectedFaceGroups = [];
-    // var selectedPictures = [];
-    // var selectedNames = [];
-    // var selectedNotes = [];
+        //loops through each checkbox to see if selected and then adds selected check boxes to the array selected_groups
+        var formFaceVar = document.forms[0];
+        for (i = 0; i < formFaceVar.length; i++) {
+            if (formFaceVar[i].checked) {
+                selected_groups.push(formFaceVar[i].value);
+            }
+        }
+        
+        // load names, picture, and notes into selected arrays
+        for (i = 0; i < selected_groups.length; i++) {
+            for (j = 0; j < person_groups.length; j++) {
+                if (selected_groups[i] == person_groups[j].group_id) {
+                    var person_id = person_groups[j].person_id;
+                    for (k = 0; k < persons.length; k++){
+                        if (persons[k].id == person_id) {
+                            selected_pictures.push(persons[k].picture);
+                            selected_names.push(persons[k].name);
+                            selected_notes.push(persons[k].notes);
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-    // //Change Picture when you press next button
-    // function changePicture() {
-    //     event.preventDefault();
-    //     faceOrNotes = 'face';
-    //     $('#FaceBox').css('background', selectedPictures[x]);
-    //     $('#FaceBox').css('background-size', 'cover');
-    //     $('#FaceBox').css('background-position', 'center');
-    //     $('#FaceBox').css('background-repeat', 'no-repeat');
-    //     $('#FaceBoxText').text("");
-    //     $('#FaceBoxText-notes').text("");
-    // }
+     
+    //Change Picture when you press next button
+    function changePicture() {
+        event.preventDefault();
+        faceOrNotes = 'face';
+        $('#FaceBox').css('background', selected_pictures[card_num]);
+        $('#FaceBox').css('background-size', 'cover');
+        $('#FaceBox').css('background-position', 'center');
+        $('#FaceBox').css('background-repeat', 'no-repeat');
+        $('#FaceBoxText').text("");
+        $('#FaceBoxText-notes').text("");
+    }
 
-    // function changeNote() {
-    //     event.preventDefault();
-    //     faceOrNotes = 'notes';
-    //     $('#FaceBox').css('background', '');
-    //     $('#FaceBoxText').text(selectedNames[x]);
-    //     $('#FaceBoxText-notes').text(selectedNotes[x]);
-    //     $('#FaceBox').attr('class', 'textWindow');
-    //     if (x == selectedNames.length - 1) {
-    //         x = 0;
-    //     } else {
-    //         x = x + 1;
-    //     }
-    // }
-    // function runNextFace() {
-    //     if (faceOrNotes == 'face') {
-    //         return changeNote();
-    //     } else {
-    //         return changePicture();
-    //     }
-    // }
+    function changeNote() {
+        event.preventDefault();
+        faceOrNotes = 'notes';
+        $('#FaceBox').css('background', '');
+        $('#FaceBoxText').text(selected_names[card_num]);
+        $('#FaceBoxText-notes').text(selected_notes[card_num]);
+        $('#FaceBox').attr('class', 'textWindow');
+        for (i = 0; i < selected_names.length; i++){
+        }
+        if (card_num == selected_names.length - 1) {
+            card_num= 0;
+        } else {
+            card_num = card_num +1 ;
+        }
+    }
+    function runNextFace() {
+        if (faceOrNotes == 'face') {
+            return changeNote();
+        } else {
+            return changePicture();
+        }
+    }
 
-    // //get selected groups and load them from the library to the selected groups
-    // function getSelectedFaceGroups() {
-    //     x = 0;
-    //     selectedFaceGroups = [];
-    //     selectedPictures = [];
-    //     selectedNames = [];
-    //     selectedNotes = [];
-
-    //     var formFaceVar = document.forms[0];
-    //     var i;
-    //     //loops through each checkbox to see if selected and then adds selected check boxes to the array selectedFaceGroups
-    //     for (i = 0; i < formFaceVar.length; i++) {
-    //         if (formFaceVar[i].checked) {
-    //             selectedFaceGroups.push(formFaceVar[i].value);
-    //         }
-    //     }
-
-    //     // goes through each selected category
-    //     for (y = 0; y < selectedFaceGroups.length; y++) {
-    //         //checks entire library of person groups to see if selected category is there and then uses the person_id to adds pictures from library to selected arrays if it is  
-    //         for (z = 0; z < library_pg_groups.length; z++) {
-    //             if (selectedFaceGroups[y] == library_pg_groups[z]) {
-    //                 var v = library_pg_persons[z];
-    //                 selectedPictures.push(library_persons_pictures[v]);
-    //                 selectedNames.push(library_persons_names[v]);
-    //                 selectedNotes.push(library_persons_notes[v]);
-    //             }
-    //         }
-    //     }
-    // }
-
-    // //load form section function to reload all checkboxes"
-    // loadGroupsToFaceCards();
-    // // function loadGroupsToFaceCards() {
-    // //     for (i = 0; i < library_groups.length; i++) {
-    // //         $('#groups').append("<label class='CheckBoxContainer'> " + library_groups[i]
-    // //             + "<input type='checkbox' name='categories' value='" + library_groups[i] + "'> <span class='checkmark'></span></label>");
-    // //     }
-    // // }
-
-
-    //**********************************************************************************
-    //**********************************************************************************
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     // Buttons that call functions
-    // ********************************************************************************
-    // ********************************************************************************
+    // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-    // // Buttons on FaceCards page
-    // $('#nextFace').click(runNextFace);
-    // $('#groups').change(getSelectedFaceGroups);
-    // $('.formSection').on('change', '#groups', getSelectedFaceGroups);
-
+    // Buttons on FaceCards page
+    $('#nextFace').click(runNextFace);
+    $('#groups').change(getSelectedFaceGroups);
 
     //Buttons on FaceCardsGroups page
     $('#addGroup').click(addGroup);
