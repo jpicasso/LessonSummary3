@@ -1,0 +1,844 @@
+{
+	"info": {
+		"_postman_id": "e9ec3166-d8b5-4b64-8fa7-be4c41ce083e",
+		"name": "faceNodes",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "admin",
+			"item": [
+				{
+					"name": "/groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"dumm group name\", \"user_id\":2}\n"
+						},
+						"url": {
+							"raw": "{{host}}/groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/persons",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"newPersonName\", \"notes\": \"notes about new person\", \"picture\": \"new person picture\", \"group_id\": 2}\n\n"
+						},
+						"url": {
+							"raw": "{{host}}/persons",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"persons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/person_groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"person_id\": 99, \"group_id\":9, \"user_id\":2}\n\n"
+						},
+						"url": {
+							"raw": "{{host}}/person_groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"person_groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/groups/<group_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/persons/<person_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/person_groups/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/person_groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"person_groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/groups/<group_id>_ERROR",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name2\":\"dummy group name\"}\n"
+						},
+						"url": {
+							"raw": "{{host}}/groups/4",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/persons/<person_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"newPersonName\", \"notes\": \"notes about new person\", \"picture\": \"new person picture\"}\n"
+						},
+						"url": {
+							"raw": "{{host}}/persons/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"persons",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/loaddata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/loaddata",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"loaddata"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlJEZEdNelZCUWtFMlJVWkZRVFUzT0RRMlJrTkJNREl4TWpWRVJqSTJNVVUwUWpNME5EY3pNUSJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktcGljYXNzby5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViODUwYTUxY2MxYWMwYzE0OWJlZGU4IiwiYXVkIjoiZmFjZW5vZGVzQVBJIiwiaWF0IjoxNTg5MTQ2Mzc1LCJleHAiOjE1ODkxNTM1NzUsImF6cCI6ImRyTm5OV3g2NDZFczVCVlVTOVRQdUM0WE1CVjc3b0JNIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6Z3JvdXBzIiwiZGVsZXRlOnBlcnNvbl9ncm91cHMiLCJkZWxldGU6cGVyc29ucyIsImVkaXQ6Z3JvdXBzIiwiZWRpdDpwZXJzb25zIiwiZ2V0OmRhdGEiLCJwb3N0Omdyb3VwcyIsInBvc3Q6cGVyc29uX2dyb3VwcyIsInBvc3Q6cGVyc29ucyJdfQ.ltIX0Mbhvo22glTxDNdrBiMeL6qvGmd-sQpTSuNhb6eN6yIhksHY--NT3cJ2eKfN9qfyAtKfCQbQLAMidmxG0ICTkhPngkJANjDSWuEBJP5UrLt3Lsz73VsEC3rDjXVRTXqTUaFfFv3es6smILsFyMIIiwVeRVVOmAZTKuH9Oti-8x_fRrJqVt79ysKdEF690e5iAcHmGgnbVPkdybrPtI7G5V9rcAR_RDFoAcpzPViaBxg6NvZ2NCN0WFysrPVweEhLPNrR_8UH67bwocUH_qxC4hlRzh_4DO3txJFR79JUD9C_ruIEFllB4oLFgouAUkXD8UR1p2t6t4PF-8-Jig",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3137c8da-619c-4e30-913c-41f6b3103b7c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "663d5b1f-7de0-4b9d-86ee-72e94b89b64b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "userNotMember",
+			"item": [
+				{
+					"name": "/groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"dumm group name\", \"user_id\":2}\n"
+						},
+						"url": {
+							"raw": "{{host}}/groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/persons/<person_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"newPersonName\", \"notes\": \"notes about new person\", \"picture\": \"new person picture\"}\n"
+						},
+						"url": {
+							"raw": "{{host}}/persons/2",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"persons",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/persons",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\": \"newPersonName\", \"notes\": \"notes about new person\", \"picture\": \"new person picture\", \"group_id\": 2}\n\n"
+						},
+						"url": {
+							"raw": "{{host}}/persons",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"persons"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/persons/<person_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/person_groups",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"person_id\": 99, \"group_id\":9, \"user_id\":2}\n\n"
+						},
+						"url": {
+							"raw": "{{host}}/person_groups",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"person_groups"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/groups/<group_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/person_groups/<id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/person_groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"person_groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/groups/<group_id>",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {",
+									"    pm.response.to.have.status(403);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"name": "Content-Type",
+								"type": "text",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\"name\":\"dummy group name1\",\"name2\":\"dummy group name\", \"user_id\":2}\n"
+						},
+						"url": {
+							"raw": "{{host}}/groups/1",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"groups",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/loaddata",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"id": "5050a5b9-2e15-474e-9981-0e61ec8d2ff1",
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": ""
+						},
+						"url": {
+							"raw": "{{host}}/loaddata",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"loaddata"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlJEZEdNelZCUWtFMlJVWkZRVFUzT0RRMlJrTkJNREl4TWpWRVJqSTJNVVUwUWpNME5EY3pNUSJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktcGljYXNzby5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViODFjYTg1NGIxNGMwYzEyOGNjMjBhIiwiYXVkIjoiZmFjZW5vZGVzQVBJIiwiaWF0IjoxNTg5MTQ3NTYyLCJleHAiOjE1ODkxNTQ3NjIsImF6cCI6ImRyTm5OV3g2NDZFczVCVlVTOVRQdUM0WE1CVjc3b0JNIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJnZXQ6ZGF0YSJdfQ.iB7s2w-koNXOHwhqov5GqPjdMEYTt0uND5qsQpEw5EezXk7NtY0sE6TdRp9emBDgWXRvv2KQIShCSIivky1f8u6e4n3iFXwvHfFBM09SgMFgToARb8VaPDWQmA8uxCaGI5IH1T0C5H-v7FbOwiPklC82fqtOvzdfIBV88dMIGdZecoGsXJHrq-5UJI_6y-Zcusu42-b214FXSztoEOeLUeSwCqdKcIffwRGLRB9T88Ckxz8v3eLKk3Q3aOwj69plV8aOnJSaJHd2rKX14jz_fHkv9Dw1cQFtDmKFb4QSGGJXc6bXijXzVVngV4mTlSUUg3PBaag9vTC6gD-yYvkcpg",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3137c8da-619c-4e30-913c-41f6b3103b7c",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "663d5b1f-7de0-4b9d-86ee-72e94b89b64b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

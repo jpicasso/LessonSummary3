@@ -108,6 +108,7 @@ Persons Controllers
 '''
 
 @app.route('/persons', methods=['POST'])
+@requires_auth('post:persons')
 def add_person(jwt):
     print('this worked')
     data = request.get_json()
@@ -126,7 +127,8 @@ def add_person(jwt):
     })
 
 @app.route('/persons/<person_id>', methods=['PATCH'])
-def edit_person(person_id):
+@requires_auth('edit:persons')
+def edit_person(jwt, person_id):
     data = request.get_json()
     p = Person.query.get(person_id)
     p.picture = data["picture"]
@@ -137,7 +139,8 @@ def edit_person(person_id):
 
 
 @app.route('/persons/<person_id>', methods=['DELETE'])
-def deletePerson(person_id):
+@requires_auth('delete:persons')
+def deletePerson(jwt, person_id):
     Person.query.filter_by(id=person_id).delete()
     db.session.commit()
     return jsonify({ 'success': True })
@@ -150,7 +153,8 @@ PersonGroup Controllers
 '''
 
 @app.route('/person_groups', methods=['POST'])
-def addPersonGroup():
+@requires_auth('post:person_groups')
+def addPersonGroup(jwt):
     data = request.get_json()
     person_group = PersonGroup(person_id=data["person_id"], group_id=data["group_id"], user_id=2)
     db.session.add(person_group)
@@ -163,7 +167,8 @@ def addPersonGroup():
 
 
 @app.route('/person_groups/<person_group_id>', methods=['DELETE'])
-def delete_person_group(person_group_id):
+@requires_auth('delete:person_groups')
+def delete_person_group(jwt, person_group_id):
     PersonGroup.query.filter_by(id=person_group_id).delete()
     db.session.commit()
     return jsonify({ 'success': True })
@@ -174,29 +179,9 @@ def delete_person_group(person_group_id):
 Setup pages.
 ------------------------------------------------------------------------
 '''
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/facecards')
-def facecards():
-    return render_template('FaceCards.html')
-
-@app.route('/persons')
-def facecardPeronsLoad():
-    return render_template('FaceCardsPersons.html')
-
-@app.route('/groups')
-def loadgroups_page():
-    return render_template('FaceCardsGroups.html')
-
-@app.route('/edit_person')
-def edit_person_page():
-    return render_template('FaceCardsEditPerson.html')
-
 @app.route('/loaddata', methods=['GET'])
-def loaddata():
+@requires_auth('get:data')
+def loaddata(jwt):
     user_id = 2
     users = User.query.all()
     groups = Group.query.filter_by(user_id=user_id)
@@ -229,6 +214,28 @@ def loaddata():
         'persons': person_data,
         'person_groups': person_group_data,
     })
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/facecards')
+def facecards():
+    return render_template('FaceCards.html')
+
+@app.route('/persons')
+def facecardPeronsLoad():
+    return render_template('FaceCardsPersons.html')
+
+@app.route('/groups')
+def loadgroups_page():
+    return render_template('FaceCardsGroups.html')
+
+@app.route('/edit_person')
+def edit_person_page():
+    return render_template('FaceCardsEditPerson.html')
+
 
 ''' 
 ------------------------------------------------------------------------
