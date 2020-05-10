@@ -4,8 +4,14 @@
 ----------------------------------------------------------------------------#
 '''
 
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, request, abort
 from flask_sqlalchemy import SQLAlchemy
+import os
+from flask_cors import CORS
+import ast
+
+from .auth.auth import AuthError, requires_auth
+
 
 '''
 ----------------------------------------------------------------------------#
@@ -16,6 +22,9 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://johnpicasso:1234@localhost:5432/facenodes'
 db = SQLAlchemy(app)
+# setup_db(app)
+CORS(app)
+
 
 
 '''
@@ -31,13 +40,13 @@ class Person(db.Model):
     name = db.Column(db.String(120))
     picture = db.Column(db.String(500))
     notes = db.Column(db.String(500))
-    # user = db.Column(db.Integer(500), ForeignKey=True)
-
+    user_id = db.Column(db.Integer)
 
 class Group(db.Model):
     __tablename__ = 'group2'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(120))
+    user_id = db.Column(db.Integer)
 
 
 class PersonGroup(db.Model):
@@ -45,13 +54,14 @@ class PersonGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     person_id = db.Column(db.Integer)
     group_id = db.Column(db.Integer)
+    user_id = db.Column(db.Integer)
 
+class User(db.Model):
+    __tablename__ = 'user_table'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120))
+    email = db.Column(db.String(120))
 
-'''
-----------------------------------------------------------------------------#
- CONTROLLERs
-----------------------------------------------------------------------------#
-'''
 
 '''
 -------------------------------------------------------------------
@@ -60,9 +70,10 @@ Groups Controllers
 '''
 
 @app.route('/groups', methods=['POST'])
-def add_group():
+@requires_auth('post:groups')
+def add_group(jwt):
    data = request.get_json()
-   group = Group(name=data["name"])
+   group = Group(name=data["name"], user_id=2)
    db.session.add(group)
    db.session.commit()
    
@@ -73,14 +84,16 @@ def add_group():
 
 
 @app.route('/groups/<group_id>', methods=['DELETE'])
-def delete_group(group_id):
+@requires_auth('delete:groups')
+def delete_group(jwt, group_id):
     Group.query.filter_by(id=group_id).delete()
     db.session.commit()
     return jsonify({ 'success': True })
 
 
 @app.route('/groups/<group_id>', methods=['PATCH'])
-def edit_groups(group_id):
+@requires_auth('edit:groups')
+def edit_groups(jwt, group_id):
     data = request.get_json()
     g = Group.query.get(group_id)
     g.name = data["name2"]
@@ -95,13 +108,14 @@ Persons Controllers
 '''
 
 @app.route('/persons', methods=['POST'])
-def add_person():
+def add_person(jwt):
+    print('this worked')
     data = request.get_json()
-    person = Person(name=data["name"], picture=data["picture"], notes=data["notes"])
+    person = Person(name=data["name"], picture=data["picture"], notes=data["notes"],user_id=2)
     db.session.add(person)
     db.session.commit()
 
-    person_group = PersonGroup(person_id=person.id, group_id=data["group_id"])
+    person_group = PersonGroup(person_id=person.id, group_id=data["group_id"],user_id=2)
     db.session.add(person_group)
     db.session.commit()
 
@@ -138,7 +152,7 @@ PersonGroup Controllers
 @app.route('/person_groups', methods=['POST'])
 def addPersonGroup():
     data = request.get_json()
-    person_group = PersonGroup(person_id=data["person_id"], group_id=data["group_id"])
+    person_group = PersonGroup(person_id=data["person_id"], group_id=data["group_id"], user_id=2)
     db.session.add(person_group)
     db.session.commit()
 
@@ -183,13 +197,19 @@ def edit_person_page():
 
 @app.route('/loaddata', methods=['GET'])
 def loaddata():
-    groups = Group.query.order_by('id').all()
+    user_id = 2
+    users = User.query.all()
+    groups = Group.query.filter_by(user_id=user_id)
     group_data =[]
-    persons = Person.query.order_by('id').all()
+    persons = Person.query.filter_by(user_id=user_id)
     person_data = []
-    person_groups = PersonGroup.query.order_by('id').all()
+    person_groups = PersonGroup.query.filter_by(user_id=user_id)
     person_group_data = []
     
+    for u in users:
+        if user_id == u.id:
+            user = {"id": u.id, "name": u.name, "email": u.email}
+
     for g in groups:
         new_dictionary = {"id": g.id, "name": g.name}
         group_data.append(new_dictionary)
@@ -204,6 +224,7 @@ def loaddata():
 
     return jsonify({ 
         'success': True,
+        'user': user,
         'groups': group_data,
         'persons': person_data,
         'person_groups': person_group_data,

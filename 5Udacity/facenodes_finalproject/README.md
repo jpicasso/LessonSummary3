@@ -80,6 +80,18 @@ terminal commands executed...don't run this in the virtual environment or it won
 5. Navigate to Home page [http://localhost:5432]
 
 
+## Testing
+To run the tests, run the below...make sure to re run every line each time you want to test it
+```bash
+dropdb facenodes_test && createdb facenodes_test
+# psql trivia_test < trivia.psql 
+psql facenodes_test
+# run insert commmands from sqlcommands.txt file
+python3 test_flaskr.py
+```
+results should come back with zero errors
+
+
 ## API Endpoints
 '/playgame' GET
 - Purpose: loads one person from Persons table

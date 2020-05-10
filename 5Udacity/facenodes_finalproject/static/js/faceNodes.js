@@ -23,9 +23,16 @@ $(document).ready(function () {
         this.group_id = group_id;
     }
 
+    function User(id, name, email){
+        this.id = id;
+        this.name = name;
+        this.email = email;
+    }
+
     var groups = [];
     var persons = [];
     var person_groups = [];
+    var current_user = new User("1","default","default_email");
 
 
     // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -54,6 +61,11 @@ $(document).ready(function () {
                 var new_pg = new PersonGroup(pg[i].id, pg[i].person_id, pg[i].group_id);
                 person_groups.push(new_pg);
             }
+            var u = json.user;
+            current_user["id"] = u.id;
+            current_user["name"] = u.name;
+            current_user["email"] = u.email;
+
             loadGroups();
             loadPersons();
             loadPerson();
