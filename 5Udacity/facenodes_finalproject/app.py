@@ -237,6 +237,11 @@ def edit_person_page():
     return render_template('FaceCardsEditPerson.html')
 
 
+@app.route('/logon')
+def logon():
+    return render_template('logonPage.html')
+
+
 ''' 
 ------------------------------------------------------------------------
 Launch.

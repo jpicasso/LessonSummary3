@@ -19,8 +19,10 @@ class AuthError(Exception):
 def get_token_auth_header():
     """Obtains the Access Token from the Authorization Header
     """
+    print('getting token')
 
     auth = request.headers.get('Authorization', None)
+    print (auth)
     if not auth:
         raise AuthError({
             'code': 'authorization_header_missing',
@@ -56,7 +58,7 @@ def check_permissions(permission, payload):
     It will return True if user has permission and an error if user doesn't
     have permission (403) or if  permissions section is not in payload (400)
     """
-
+    print('checking permissions')
     if 'permissions' not in payload:
         abort(400)
     if permission not in payload['permissions']:

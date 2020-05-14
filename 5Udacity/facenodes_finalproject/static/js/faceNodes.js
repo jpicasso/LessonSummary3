@@ -33,16 +33,29 @@ $(document).ready(function () {
     var persons = [];
     var person_groups = [];
     var current_user = new User("1","default","default_email");
-
+    var token = 'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlJEZEdNelZCUWtFMlJVWkZRVFUzT0RRMlJrTkJNREl4TWpWRVJqSTJNVVUwUWpNME5EY3pNUSJ9.eyJpc3MiOiJodHRwczovL3VkYWNpdHktcGljYXNzby5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWViYzZkMjdiOTg2M2YwYzZjMjk1ODMzIiwiYXVkIjoiZmFjZW5vZGVzQVBJIiwiaWF0IjoxNTg5NDg5OTE4LCJleHAiOjE1ODk0OTcxMTgsImF6cCI6ImRyTm5OV3g2NDZFczVCVlVTOVRQdUM0WE1CVjc3b0JNIiwic2NvcGUiOiIiLCJwZXJtaXNzaW9ucyI6WyJkZWxldGU6Z3JvdXBzIiwiZGVsZXRlOnBlcnNvbl9ncm91cHMiLCJkZWxldGU6cGVyc29ucyIsImVkaXQ6Z3JvdXBzIiwiZWRpdDpwZXJzb25zIiwiZ2V0OmRhdGEiLCJwb3N0Omdyb3VwcyIsInBvc3Q6cGVyc29uX2dyb3VwcyIsInBvc3Q6cGVyc29ucyJdfQ.AslMeKEkfO0vyVmbwOHc7FDb3wCdedZSpU9PE5nUcSpyaAUTvgAA0sW_zn8FyqfK-AGqJRB8x8SvKGUC0lVwAmEMy3Hxx_wkJUcYgrfGskCPTfygBT6HuX4RL3JSz9ylDaCGWpJ-_-PpEF8ZXAW8pX_UTIVozEqKF30Br9oiuGM92PFuGO3AQjjsQePWUHDpvYIULD-l0hUOvKgmAjZlBrqqyGF0bByfDBkb0pe8gArBHQqQo7l-rThOycSYWZL3951jbQ8_gfdeuvvENw0Y5BU2Iz8kbXcwEZyA1KnsdpYoQlXc7mpqHuaTTnAjv2blVp3Z-KaDlS1ExOW01HWDHA';
 
     // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     // Load data from DB to local js variables
     // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
+    function login(){
+        var auth0_response = window.location.href;
+        var start = auth0_response.indexOf('access_token=');
+        var end = auth0_response.indexOf('&expires');
+        token = auth0_response.slice(start+13, end);
+        localStorage.setItem("jwt_token", token);
+        window.location.href = "/facecards";
+    }
+
+
     updateLocalVarFromDB();
     function updateLocalVarFromDB() {
+        token = localStorage.getItem("jwt_token");
+        
         fetch('/loaddata', {
             method: 'GET',
+            headers: { "Authorization": 'Bearer ' + token }
         }).then(function (response) {
             return response.json();
         }).then(function (json) {
@@ -488,7 +501,10 @@ $(document).ready(function () {
     // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
     // Buttons that call functions
     // ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
+    
+    // Login and out
+    $('#login').click(login);
+    
     // Buttons on FaceCards page
     $('#nextFace').click(runNextFace);
     $('#groups').change(getSelectedFaceGroups);
